@@ -1,6 +1,7 @@
 import logging
 import time
 import os
+import config
 
 from telegram import (
     Update
@@ -20,12 +21,15 @@ prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special
 
+
 if deployment == "DEV":
     log_level = logging.DEBUG
-    token = "7576351329:AAH-_giC8C3IpOz5cXNaaf5YIPx3hpu9j6c" # Hardcoded tokens LETS GOOOOOOOOO
+    # token = os.environ["TELEGRAM_DEV_TOKEN"]
+    token = config.tokens["telegram_dev"]
 else:
     log_level = logging.INFO
-    token = os.getenv("TOKEN") # See I do some things right
+    # token = os.environ["TELEGRAM_PROD_TOKEN"]
+    token = config.tokens["telegram_prod"]
 
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 # idk what this does but the example used it and it works so I'm keeping it
