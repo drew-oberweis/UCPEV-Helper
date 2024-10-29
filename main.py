@@ -30,22 +30,32 @@ else:
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 # idk what this does but the example used it and it works so I'm keeping it
 logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
 
 logging.basicConfig(format=log_format, level=log_level, filename=log_filename)
 
 logger = logging.getLogger(__name__)
 
+commands = {
+    "nosedive": simple_commands.nosedive,
+    "rules": simple_commands.rules,
+    "links": simple_commands.links
+}
 
-def test(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.info("Test command called")
-    print("Test command called")
-    return "Test command called"
+commands_descriptions = {
+    "nosedive": "Sends a link to a nosedive video",
+    "rules": "Sends the rules of the group",
+    "links": "Sends a list of useful links"
+}
+
 
 
 def main():
     app = Application.builder().token(token).build()
-    app.add_handler(CommandHandler("test", test))
-    app.add_handler(CommandHandler("nosedive", simple_commands.nosedive))
+    for i in commands: # Added programatically to make commands able to be referenced
+        app.add_handler(CommandHandler(i, commands[i]))
+
+    # make commands show when you type "/" in chat
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
