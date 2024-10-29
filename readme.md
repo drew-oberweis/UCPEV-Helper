@@ -2,12 +2,12 @@ This is a bot for UIUC PEV, a PEV group based in Champaign/Urbana, Illinois.
 
 Command list:
 ride - Displays next scheduled ride [WIP]
-discounts - Displays a list of discount codes, mostly stolen from ChiPEV [WIP]
-help - Displays a list of available commands [WIP]
-pads - Links to recommended pads [WIP]
-links - Displays relevant links (Discord, Linktree, Instrgram, etc) [WIP]
-helmet - Links to recommended helmets [WIP]
-rules - Displays group rules [WIP]
+discounts - Displays a list of discount codes, mostly stolen from ChiPEV
+help - Displays a list of available commands
+pads - Links to recommended pads
+links - Displays relevant links (Discord, Linktree, Instrgram, etc) 
+helmet - Links to recommended helmets
+rules - Displays group rules
 
 Admin commands:
 schedule_ride - Add a scheduled ride [WIP]

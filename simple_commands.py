@@ -9,12 +9,14 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
 )
+from telegram.constants import ParseMode
 
 logger = logging.getLogger(__name__)
 
 """
 This file contains simple commands that provide a canned response, with no secondary effects and no database interaction.
 No database interaction until I stop being lazy and implement it.
+Eventually all of these responses should pull dynamically from the database to allow updates without code changes.
 """
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
@@ -33,13 +35,22 @@ responses = { # Eventually, this will all be pulled from a database editable on 
             """, # 3 tabs at the beginning keeps the alignment at bay
 
     "nosedive": 'ayy lmao\nhttps://www.youtube.com/watch?v=kc6IEVV9mp0', # stolen directly from ChiPEV
-    "links": "All of our links can be found here: https://linktr.ee/UIUCPEV"
+    "links": "All of our links can be found [here](https://linktr.ee/UIUCPEV)",
+    "codes": "Discount codes are stolen from ChiPEV, and can be found [here](https://docs.google.com/spreadsheets/d/1QTMuWO8k5719MeBt535rA_kPvSEVmiTI3wVA9Bcwu5g/edit?usp=sharing)",
+    "helmet": """[I LOVE HELMETS](https://www.youtube.com/watch?v=b9yL5usLFgY)\n
+            Make sure you wear a good helmet\!\n
+            Some good brands:\n
+            [Bern](http://www.bernunlimited.com/)\n
+            [Zeitbike](https://www.zeitbike.com/collections/helmets/)\n
+            [Thousand](https://www.explorethousand.com/)\n
+            [Ruroc](https://www.ruroc.com/en/)
+            """
 }
 
 
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
     logger.info(f"Sending message: {message}")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.MARKDOWN_V2)
     return
 
 async def links(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,4 +68,27 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rules_msg = responses["rules_header"] + "\n\n" + responses["rules"]
     await send_message(update, context, rules_msg)
 
+    return
+
+async def helmet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Helmet command called")
+    await send_message(update, context, responses["helmet"])
+    return
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Help command called")
+    help_msg = "Here are the commands you can use:\n"
+    for i in responses: # TODO: Make this filter by what the user can actually do
+        help_msg += f"/{i} - {responses[i]}\n"
+    await send_message(update, context, help_msg)
+    return
+
+async def pads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Pads command called")
+    await send_message(update, context, "Pads are important! Make sure you wear them!")
+    return
+
+async def codes(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Codes command called")
+    await send_message(update, context, responses["codes"])
     return

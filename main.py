@@ -39,13 +39,21 @@ logger = logging.getLogger(__name__)
 commands = {
     "nosedive": simple_commands.nosedive,
     "rules": simple_commands.rules,
-    "links": simple_commands.links
+    "links": simple_commands.links,
+    "codes": simple_commands.codes,
+    "helmet": simple_commands.helmet,
+    "help": simple_commands.help,
+    "pads": simple_commands.pads
 }
 
 commands_descriptions = {
     "nosedive": "Sends a link to a nosedive video",
     "rules": "Sends the rules of the group",
-    "links": "Sends a list of useful links"
+    "links": "Sends a list of useful links",
+    "codes": "Sends a link to a list of discount codes",
+    "helmet": "Sends a list of recommended helmet brands",
+    "help": "Sends a list of commands",
+    "pads": "Sends a list of recommended pads"
 }
 
 
