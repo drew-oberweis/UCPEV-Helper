@@ -5,7 +5,8 @@ commands_descriptions = {
     "codes": "Sends a link to a list of discount codes",
     "helmet": "Sends a list of recommended helmet brands",
     "help": "Sends a list of commands",
-    "pads": "Sends a list of recommended pads"
+    "pads": "Sends a list of recommended pads",
+    "i2s": "Sends a message about Intro 2 Speed"
 }
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
@@ -34,5 +35,6 @@ responses = { # Eventually, this will all be pulled from a database editable on 
             [Thousand](https://www.explorethousand.com/)\n
             [Ruroc](https://www.ruroc.com/en/)
             """,
-    "pads": "TSG, G\-Form, Revzilla\n\n [GForm](https://g-form.com/)\n[Revzilla](https://www.revzilla.com)\n"
+    "pads": "TSG, G\-Form, Revzilla\n\n [GForm](https://g-form.com/)\n[Revzilla](https://www.revzilla.com)\n",
+    "i2s": "Intro 2 Speed \(I2S\) is an event where new and experienced riders can practice together and learn new skills\. It is a great way to meet other riders and learn how to ride safely\. We try to hold I2S every week at lot E14 when weather permits, but it occasionally gets moved, so keep up to date using /rides\!"
 }

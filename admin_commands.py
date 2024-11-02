@@ -42,9 +42,13 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     message = " ".join(context.args)
     message = await context.bot.send_message(update.effective_chat.id, message)
-    # await message.pin()
+
+    discord_ping_all = False
+    if deployment == "prod":
+        await message.pin()
+        discord_ping_all = True
 
     webhook_url = environment_handler.get_discord_webhook()
-    utils.send_discord_webhook(webhook_url, message.text)
+    utils.send_discord_webhook(webhook_url, message.text, discord_ping_all)
 
     return
