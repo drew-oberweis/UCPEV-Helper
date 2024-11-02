@@ -16,6 +16,9 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
+import db
+from discord_webhook import DiscordWebhook
+
 logger = logging.getLogger(__name__)
 
 async def is_admin(chat: Chat, user: User, context: ContextTypes.DEFAULT_TYPE):
@@ -55,3 +58,10 @@ def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tup
     ] or (new_status == ChatMember.RESTRICTED and new_is_member is True)
 
     return was_member, is_member
+
+def send_discord_webhook(url: str, message: str, ping_all: bool = False):
+    if ping_all:
+        message = "@everyone " + message
+    webhook = DiscordWebhook(url=url, content=message, username="UC PEV Helper")
+    response = webhook.execute()
+    return response

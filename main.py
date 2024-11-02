@@ -1,8 +1,6 @@
 import logging
 import time
 import os
-import sys
-from dotenv import load_dotenv
 
 from telegram import (
     Update
@@ -18,6 +16,8 @@ from telegram.ext import (
 import simple_commands
 import admin_commands
 import data
+import db
+import environment_handler
 
 commands_descriptions = data.commands_descriptions
 
@@ -31,25 +31,16 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
 logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
 
-
-
 logger = logging.getLogger(__name__)
 
+deployment, token, db_creds = environment_handler.get_env_vars()
 
-load_dotenv()
-
-try:
-    log_level = logging.INFO
-    token = os.environ["telegram_token"]
-    # token = os.getenv("telegram_token")
-    logging.basicConfig(format=log_format, level=logging.INFO, stream=sys.stdout)
-    logger.log(logging.INFO, "Production deployment detected, using production token and log config")
-except KeyError: # If the token isn't found, it's a production deployment
-    # token = os.environ["TELEGRAM_DEV_TOKEN"]
-    token = os.getenv("telegram_dev")
-    logging.basicConfig(format=log_format, level=logging.DEBUG, filename=log_filename)
-    logger.log(logging.INFO, "Development deployment detected, using development token and log config")
-
+db_creds = db.DB_Credentials(
+    host=os.getenv("postgres_host", None),
+    user=os.getenv("postgres_user", None),
+    password=os.getenv("postgres_pass", None),
+    database=os.getenv("postgres_db", None)
+)
 
 commands = {
     "nosedive": simple_commands.nosedive,
@@ -62,7 +53,8 @@ commands = {
 }
 
 admin_commands = {
-    "test_admin": admin_commands.test_admin
+    "test_admin": admin_commands.test_admin,
+    "announce": admin_commands.announce
 }
 
 def main():
