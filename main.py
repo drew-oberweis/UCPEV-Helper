@@ -54,6 +54,7 @@ commands = {
 
 admin_commands = {
     "test_admin": admin_commands.test_admin,
+
     "announce": admin_commands.announce
 }
 
