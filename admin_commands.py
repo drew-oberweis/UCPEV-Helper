@@ -28,6 +28,6 @@ def confirm_admin(func):
 
 @confirm_admin
 async def test_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.info("Test admin command called")
+    logger.debug("Test admin command called")
     await context.bot.send_message(update.effective_chat.id, "You are an admin.")
     return
