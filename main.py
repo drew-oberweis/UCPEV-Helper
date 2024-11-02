@@ -1,7 +1,7 @@
 import logging
 import time
 import os
-import config
+from dotenv import load_dotenv
 
 from telegram import (
     Update
@@ -14,6 +14,9 @@ from telegram.ext import (
 )
 
 import simple_commands
+import data
+
+commands_descriptions = data.commands_descriptions
 
 deployment = "DEV" # Change to "PROD" when deploying to production
 
@@ -21,20 +24,22 @@ prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special
 
+load_dotenv()
 
 if deployment == "DEV":
     log_level = logging.DEBUG
     # token = os.environ["TELEGRAM_DEV_TOKEN"]
-    token = config.tokens["telegram_dev"]
+    token = os.getenv("telegram_dev")
 else:
     log_level = logging.INFO
     # token = os.environ["TELEGRAM_PROD_TOKEN"]
-    token = config.tokens["telegram_prod"]
+    token = os.getenv("telegram_prod")
 
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 # idk what this does but the example used it and it works so I'm keeping it
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
 
 logging.basicConfig(format=log_format, level=log_level, filename=log_filename)
 
@@ -49,18 +54,6 @@ commands = {
     "help": simple_commands.help,
     "pads": simple_commands.pads
 }
-
-commands_descriptions = {
-    "nosedive": "Sends a link to a nosedive video",
-    "rules": "Sends the rules of the group",
-    "links": "Sends a list of useful links",
-    "codes": "Sends a link to a list of discount codes",
-    "helmet": "Sends a list of recommended helmet brands",
-    "help": "Sends a list of commands",
-    "pads": "Sends a list of recommended pads"
-}
-
-
 
 def main():
     app = Application.builder().token(token).build()
