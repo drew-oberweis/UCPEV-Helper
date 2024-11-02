@@ -15,7 +15,7 @@ import utils
 import environment_handler
 
 logger = logging.getLogger(__name__)
-deployment, token, db_creds = environment_handler.get_env_vars()
+token, db_creds = environment_handler.get_env_vars()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -43,12 +43,9 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = " ".join(context.args)
     message = await context.bot.send_message(update.effective_chat.id, message)
 
-    discord_ping_all = False
-    if deployment == "prod":
-        await message.pin()
-        discord_ping_all = True
+    await message.pin()
 
     webhook_url = environment_handler.get_discord_webhook()
-    utils.send_discord_webhook(webhook_url, message.text, discord_ping_all)
+    utils.send_discord_webhook(webhook_url, message.text, True)
 
     return

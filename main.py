@@ -34,7 +34,7 @@ logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-deployment, token, db_creds = environment_handler.get_env_vars()
+token, db_creds = environment_handler.get_env_vars()
 
 db_creds = db.DB_Credentials(
     host=os.getenv("postgres_host", None),
@@ -43,14 +43,8 @@ db_creds = db.DB_Credentials(
     database=os.getenv("postgres_db", None)
 )
 
-if deployment == "prod":
-    log_level = logging.INFO
-    logging.basicConfig(format=log_format, level=logging.INFO, stream=sys.stdout)
-    logger.log(logging.INFO, "Production deployment detected, using production token and log config")
-else:
-    logging.basicConfig(format=log_format, level=logging.DEBUG, filename=log_filename)
-    logger.log(logging.INFO, "Development deployment detected, using development token and log config")
-
+log_level = logging.DEBUG
+logging.basicConfig(format=log_format, level=logging.INFO, stream=sys.stdout)
 
 commands = {
     "nosedive": simple_commands.nosedive,
