@@ -14,6 +14,7 @@ from telegram.ext import (
 )
 
 import simple_commands
+import admin_commands
 import data
 
 commands_descriptions = data.commands_descriptions
@@ -55,12 +56,18 @@ commands = {
     "pads": simple_commands.pads
 }
 
+admin_commands = {
+    "test_admin": admin_commands.test_admin
+}
+
 def main():
     app = Application.builder().token(token).build()
     for i in commands: # Added programatically to make commands able to be referenced
         app.add_handler(CommandHandler(i, commands[i]))
+    for i in admin_commands:
+        app.add_handler(CommandHandler(i, admin_commands[i]))
 
-    # make commands show when you type "/" in chat
+    # TODO: make commands show when you type "/" in chat
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
