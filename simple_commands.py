@@ -80,3 +80,8 @@ async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.debug("Welcome command called")
         await send_message(update, context, responses["welcome"])
     return
+
+async def i2s(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.debug("I2S command called")
+    await send_message(update, context, responses["i2s"])
+    return

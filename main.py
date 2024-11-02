@@ -49,12 +49,12 @@ commands = {
     "codes": simple_commands.codes,
     "helmet": simple_commands.helmet,
     "help": simple_commands.help,
-    "pads": simple_commands.pads
+    "pads": simple_commands.pads,
+    "i2s": simple_commands.i2s
 }
 
 admin_commands = {
     "test_admin": admin_commands.test_admin,
-
     "announce": admin_commands.announce
 }
 
