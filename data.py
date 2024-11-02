@@ -9,7 +9,7 @@ commands_descriptions = {
 }
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
-    "welcome": "Welcome to UIUC PEV\! Do /rules to check the rules of the group, and /help to see other commands!",
+    "welcome": "Welcome to UIUC PEV\! Do /rules to check the rules of the group, and /help to see other commands\!",
     "rules_header": "The rules of this group are generally pretty simple\. They are:",
     "rules": """            1\. Wear a helmet\n 
             2\. WEAR A HELMET\n

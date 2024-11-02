@@ -12,6 +12,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    ChatMemberHandler,
 )
 
 import simple_commands
@@ -70,6 +71,8 @@ def main():
         app.add_handler(CommandHandler(i, commands[i]))
     for i in admin_commands:
         app.add_handler(CommandHandler(i, admin_commands[i]))
+
+    app.add_handler(ChatMemberHandler(simple_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
 
     # TODO: make commands show when you type "/" in chat
 

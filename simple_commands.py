@@ -1,4 +1,5 @@
 import logging
+import utils
 
 from telegram import (
     Update
@@ -69,4 +70,13 @@ async def pads(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def codes(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Codes command called")
     await send_message(update, context, responses["codes"])
+    return
+
+async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    was_member, is_member = utils.extract_status_change(update.chat_member)
+
+    if not was_member and is_member:
+        logger.debug("Welcome command called")
+        await send_message(update, context, responses["welcome"])
     return
