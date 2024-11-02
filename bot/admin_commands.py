@@ -16,12 +16,13 @@ import utils
 logger = logging.getLogger(__name__)
 
 def confirm_admin(func):
-    def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if not utils.is_admin(update.effective_chat, update.effective_user, context):
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        is_admin = await utils.is_admin(update.effective_chat, update.effective_user, context)
+        if not is_admin:
             logger.info(f"Unauthorized access to command {func.__name__} by user {update.effective_user.id}")
-            context.bot.send_message(update, context, "You are not authorized to use this command.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
             return
-        return func(update, context)
+        return await func(update, context)
     return wrapper
 
 
