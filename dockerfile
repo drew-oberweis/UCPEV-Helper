@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 RUN mkdir /app
 ADD admin_commands.py /app
 ADD main.py /app
