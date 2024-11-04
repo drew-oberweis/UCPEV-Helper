@@ -20,8 +20,6 @@ import data
 import db
 import environment_handler
 
-commands_descriptions = data.commands_descriptions
-
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special

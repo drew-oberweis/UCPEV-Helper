@@ -14,9 +14,10 @@ from telegram.constants import ParseMode
 import data
 
 responses = data.responses
-commands_descriptions = data.commands_descriptions
-
-commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads"]
+command_descriptions = data.command_descriptions
+admin_command_descriptions = data.admin_command_descriptions
+commands = data.commands
+admin_commands = data.admin_commands
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ Eventually all of these responses should pull dynamically from the database to a
 
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
     logger.debug(f"Sending message: {message}")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.MARKDOWN_V2)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
     return
 
 async def links(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -44,7 +45,9 @@ async def nosedive(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Rules command called")
 
-    rules_msg = responses["rules_header"] + "\n\n" + responses["rules"]
+    rules_msg = responses["rules_header"] + "\n\n"
+    for i in responses["rules"]:
+        rules_msg += f"- {i}\n"
     await send_message(update, context, rules_msg)
 
     return
@@ -52,14 +55,6 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def helmet(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Helmet command called")
     await send_message(update, context, responses["helmet"])
-    return
-
-async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.debug("Help command called")
-    help_msg = "Here are the commands you can use:\n"
-    for i in commands: # TODO: Make this filter by what the user can actually do
-        help_msg += f"/{i} \- {commands_descriptions[i]}\n"
-    await send_message(update, context, help_msg)
     return
 
 async def pads(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -84,4 +79,20 @@ async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def i2s(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("I2S command called")
     await send_message(update, context, responses["i2s"])
+    return
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.debug("Help command called")
+    help_msg = "Here are the commands you can use:\n"
+    for i in commands: # TODO: Make this filter by what the user can actually do
+        help_msg += f"/{i} - {command_descriptions[i]}\n"
+
+    is_admin = await utils.is_admin(update.effective_chat, update.effective_user, context)
+
+    if is_admin:
+        help_msg += "\n\nAdmin commands:\n"
+        for i in admin_commands:
+            help_msg += f"/{i} - {admin_command_descriptions[i]}\n"
+
+    await send_message(update, context, help_msg)
     return
