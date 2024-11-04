@@ -48,4 +48,6 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     webhook_url = environment_handler.get_discord_webhook()
     utils.send_discord_webhook(webhook_url, message.text, True)
 
+    await context.bot.delete_message(update.effective_chat.id, update.message.message_id)
+
     return
