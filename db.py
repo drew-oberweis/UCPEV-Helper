@@ -6,8 +6,7 @@ tables = {
     "users": ["username", "id"],
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
     "rides": ["creator_id", "ride_time", "meetup_location", "destination", "description"],
-    "warnings": ["user_id", "reason", "timestamp"],
-    "logs": ["level", "source", "message", "timestamp"],
+    "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"]
 }
 
