@@ -3,12 +3,14 @@ from datetime import datetime
 import logging
 
 tables = {
-    "users": ["username", "id"],
+    "users": ["username", "id", "is_admin"],
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
-    "rides": ["creator_id", "ride_time", "meetup_location", "destination", "description"],
+    "rides": ["creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description"],
     "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"]
 }
+
+from ride_convo_handler import Ride
 
 logger = logging.getLogger(__name__)
 
@@ -71,16 +73,31 @@ class Session:
             self.cursor.execute("SELECT * FROM messages")
         return self.cursor.fetchall()
     
-    def get_rides(self, ride_id=None, creator_id=None, ride_time_after=None):
-        if ride_id:
-            self.cursor.execute(f"SELECT * FROM rides WHERE ride_id = '{ride_id}'")
-        elif creator_id:
+    def get_rides(self, creator_id=None, ride_time_after=None):
+        if creator_id:
+            logger.log(logging.DEBUG, f"Getting rides for {creator_id}")
             self.cursor.execute(f"SELECT * FROM rides WHERE creator_id = '{creator_id}'")
         elif ride_time_after:
-            self.cursor.execute(f"SELECT * FROM rides WHERE ride_time > '{ride_time_after}'")
+            logger.log(logging.DEBUG, f"Getting rides after {ride_time_after}")
+            self.cursor.execute(f"SELECT * FROM rides WHERE ride_date > '{ride_time_after}'")
         else:
+            logger.log(logging.DEBUG, "Getting all rides")
             self.cursor.execute("SELECT * FROM rides")
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
+
+        rides = []
+        for ride in result:
+            this_ride = Ride()
+            this_ride.set_type(ride[1])
+            this_ride.set_date(ride[2])
+            this_ride.set_time(ride[3])
+            this_ride.set_meetup(ride[4])
+            this_ride.set_destination(ride[5])
+            this_ride.set_description(ride[6])
+            rides.append(this_ride)
+            this_ride = None
+
+        return rides
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:
@@ -91,8 +108,8 @@ class Session:
             self.cursor.execute("SELECT * FROM warnings")
         return self.cursor.fetchall()
     
-    def add_user(self, username, user_id):
-        self.cursor.execute(f"INSERT INTO users (username, id) VALUES ('{username}', '{user_id}')")
+    def add_user(self, username, user_id, is_admin=False):
+        self.cursor.execute(f"INSERT INTO users (username, id, is_admin) VALUES ('{username}', '{user_id}', '{is_admin}')")
         self.conn.commit()
 
     def rm_user(self, user_id):
@@ -102,11 +119,11 @@ class Session:
     def get_user(self, user_id):
         self.cursor.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
         user = self.cursor.fetchone()
-        logger.log(logging.INFO, f"Found user: {user}")
         return user
     
-    def update_user(self, user_id, username): # update username by ID
+    def update_user(self, user_id, username, is_admin=False): # update username by ID
         self.cursor.execute(f"UPDATE users SET username = '{username}' WHERE id = '{user_id}'")
+        self.cursor.execute(f"UPDATE users SET is_admin = '{is_admin}' WHERE id = '{user_id}'")
         self.conn.commit()
 
     def add_message(self, msg_id, user_id, chat_id, content):
@@ -117,8 +134,8 @@ class Session:
         self.cursor.execute(f"DELETE FROM messages WHERE msg_id = '{msg_id}'")
         self.conn.commit()
 
-    def add_ride(self, creator_id, ride_time, meetup_location, destination, description):
-        self.cursor.execute(f"INSERT INTO rides (creator_id, ride_time, meetup_location, destination, description) VALUES ('{creator_id}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
+    def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description):
+        self.cursor.execute(f"INSERT INTO rides (creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description) VALUES ('{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
         self.conn.commit()
 
     def rm_ride(self, ride_id):

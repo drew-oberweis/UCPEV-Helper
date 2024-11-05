@@ -1,5 +1,7 @@
 import logging
 import utils
+import os
+import datetime
 
 from telegram import (
     Update
@@ -12,6 +14,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 import data
+import db
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -87,7 +90,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for i in commands: # TODO: Make this filter by what the user can actually do
         help_msg += f"/{i} - {command_descriptions[i]}\n"
 
-    is_admin = await utils.is_admin(update.effective_chat, update.effective_user, context)
+    is_admin = await utils.is_admin(update.effective_user)
 
     if is_admin:
         help_msg += "\n\nAdmin commands:\n"
@@ -96,3 +99,24 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await send_message(update, context, help_msg)
     return
+
+async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.debug("Rides command called")
+    
+    db_creds = db.DB_Credentials(
+        host=os.getenv("postgres_host", None),
+        user=os.getenv("postgres_user", None),
+        password=os.getenv("postgres_pass", None),
+        database=os.getenv("postgres_db", None)
+    )
+
+    session = db.Session(db_creds)
+    curtime = datetime.datetime.now().timestamp()
+
+    rides = session.get_rides(ride_time_after=curtime)
+
+    rides_msg = ""
+    for ride in rides:
+        rides_msg += f"{ride}\n----------------\n"
+
+    await send_message(update, context, f"Upcoming rides:\n\n{rides_msg}")

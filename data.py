@@ -1,5 +1,5 @@
-commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads"]
-admin_commands = ["test_admin", "announce"]
+commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads", "rides"]
+admin_commands = ["test_admin", "announce", "add_ride"]
 
 command_descriptions = {
     "nosedive": "Sends a link to a nosedive video",
@@ -9,12 +9,14 @@ command_descriptions = {
     "helmet": "Sends a list of recommended helmet brands",
     "help": "Sends a list of commands",
     "pads": "Sends a list of recommended pads",
-    "i2s": "Sends a message about Intro 2 Speed"
+    "i2s": "Sends a message about Intro 2 Speed",
+    "rides": "Sends a list of upcoming rides"
 }
 
 admin_command_descriptions = {
     "test_admin": "Tests if the user is an admin",
-    "announce": "Announces a message to the group and mirror it in the Discord"
+    "announce": "Announces a message to the group and mirror it in the Discord",
+    "add_ride": "Adds a ride to the list of rides"
 }
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.

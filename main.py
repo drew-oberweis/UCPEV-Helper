@@ -12,7 +12,8 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     ChatMemberHandler,
-    filters
+    filters,
+    ConversationHandler
 )
 
 import simple_commands
@@ -21,6 +22,8 @@ import data
 import db
 import environment_handler
 import custom_handlers as c_handlers
+import utils
+import ride_convo_handler
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -44,9 +47,9 @@ db_creds = db.DB_Credentials(
 )
 
 log_level = logging.DEBUG
-logging.basicConfig(format=log_format, level=logging.INFO, stream=sys.stdout)
+logging.basicConfig(format=log_format, level=log_level, stream=sys.stdout)
 
-commands = {
+commands_map = {
     "nosedive": simple_commands.nosedive,
     "rules": simple_commands.rules,
     "links": simple_commands.links,
@@ -54,26 +57,31 @@ commands = {
     "helmet": simple_commands.helmet,
     "help": simple_commands.help,
     "pads": simple_commands.pads,
-    "i2s": simple_commands.i2s
+    "i2s": simple_commands.i2s,
+    "rides": simple_commands.rides
 }
 
-admin_commands = {
+admin_commands_map = {
     "test_admin": admin_commands.test_admin,
-    "announce": admin_commands.announce
+    "announce": admin_commands.announce,
 }
 
 def main():
     app = Application.builder().token(token).build()
-    for i in commands: # Added programatically to make commands able to be referenced
-        app.add_handler(CommandHandler(i, commands[i]))
-    for i in admin_commands:
-        app.add_handler(CommandHandler(i, admin_commands[i]))
+
+    for i in commands_map:
+        app.add_handler(CommandHandler(i, commands_map[i]))
+    for i in admin_commands_map:
+        app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(simple_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-
+    app.add_handler(ride_convo_handler.ride_add_conv_handler)
     app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
-    # TODO: make commands show when you type "/" in chat
+    command_list = utils.output_telegram_autocomplete()
+    # write the command list to a file
+    with open("commands.txt", "w") as f:
+        f.write(command_list)
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 

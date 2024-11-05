@@ -10,6 +10,7 @@ ADD data.py /app
 ADD db.py /app
 ADD environment_handler.py /app
 ADD custom_handlers.py /app
+ADD ride_convo_handler.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs

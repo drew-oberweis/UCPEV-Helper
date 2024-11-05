@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+import os
 
 from telegram import (
     Update,
@@ -18,18 +19,30 @@ from telegram.ext import (
 
 import db
 from discord_webhook import DiscordWebhook
+import data
 
 logger = logging.getLogger(__name__)
 
-async def is_admin(chat: Chat, user: User, context: ContextTypes.DEFAULT_TYPE):
-    admins_raw = await context.bot.get_chat_administrators(chat.id)
+async def is_admin(user: User):
 
-    admins = []
-    for i in range(len(admins_raw)):
-        admins.append(admins_raw[i].user.id)
+    db_creds = db.DB_Credentials(
+        host=os.getenv("postgres_host", None),
+        user=os.getenv("postgres_user", None),
+        password=os.getenv("postgres_pass", None),
+        database=os.getenv("postgres_db", None)
+    )
 
-    status = user.id in admins
-    logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin in chat {chat.id}")
+    session = db.Session(db_creds)
+
+    db_user = session.get_user(user.id)
+
+    if not db_user:
+        logger.log(logging.INFO, f"User {user.id} does not exist in the database")
+        return False
+
+    status = db_user[2]
+
+    logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
     return status
 
 
@@ -65,3 +78,15 @@ def send_discord_webhook(url: str, message: str, ping_all: bool = False):
     webhook = DiscordWebhook(url=url, content=message, username="UC PEV Helper")
     response = webhook.execute()
     return response
+
+def output_telegram_autocomplete():
+    output = ""
+
+    for i in data.command_descriptions:
+        output += f"{i} - {data.command_descriptions[i]}\n"
+
+    for i in data.admin_command_descriptions:
+        output += f"{i} - {data.admin_command_descriptions[i]} (Admin only)\n"
+
+    logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
+    return output

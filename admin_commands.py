@@ -1,13 +1,17 @@
 import logging
 
 from telegram import (
-    Update
+    Update,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
 )
 from telegram.ext import (
     Application,
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    ConversationHandler,
+    filters
 )
 from telegram.constants import ParseMode
 import data
@@ -19,7 +23,7 @@ token, db_creds = environment_handler.get_env_vars()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        is_admin = await utils.is_admin(update.effective_chat, update.effective_user, context)
+        is_admin = await utils.is_admin(update.effective_user)
         if not is_admin:
             logger.info(f"Unauthorized access to command {func.__name__} by user {update.effective_user.id}")
             await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
@@ -49,5 +53,3 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     utils.send_discord_webhook(webhook_url, message.text, True)
 
     await context.bot.delete_message(update.effective_chat.id, update.message.message_id)
-
-    return
