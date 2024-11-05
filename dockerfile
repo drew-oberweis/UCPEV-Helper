@@ -9,6 +9,7 @@ ADD utils.py /app
 ADD data.py /app
 ADD db.py /app
 ADD environment_handler.py /app
+ADD custom_handlers.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs

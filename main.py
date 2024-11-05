@@ -12,6 +12,7 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     ChatMemberHandler,
+    filters
 )
 
 import simple_commands
@@ -19,6 +20,7 @@ import admin_commands
 import data
 import db
 import environment_handler
+import custom_handlers as c_handlers
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -68,6 +70,8 @@ def main():
         app.add_handler(CommandHandler(i, admin_commands[i]))
 
     app.add_handler(ChatMemberHandler(simple_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
+
+    app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
     # TODO: make commands show when you type "/" in chat
 

@@ -43,6 +43,6 @@ responses = { # Eventually, this will all be pulled from a database editable on 
             <a href='https://www.explorethousand.com/'>Thousand</a>\n
             <a href='https://www.ruroc.com/en/'>Ruroc</a>
             """,
-    "pads": "TSG, G-Form, Revzilla\n\n<a href='https://g-form.com/'>GForm</a>\n<a href='https://www.revzilla.com'>Revzilla</a>\n",
+    "pads": "TSG, G-Form, Revzilla\n\n<a href='https://g-form.com/'>GForm</a>\n<a href='https://www.revzilla.com'>Revzilla</a>",
     "i2s": "Intro 2 Speed (I2S) is an event where new and experienced riders can practice together and learn new skills. It is a great way to meet other riders and learn how to ride safely. We try to hold I2S every week at lot E14 when weather permits, but it occasionally gets moved, so keep up to date using /rides!"
 }

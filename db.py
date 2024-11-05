@@ -3,12 +3,15 @@ from datetime import datetime
 import logging
 
 tables = {
-    "users": ["db_user_id", "username", "id"],
+    "users": ["username", "id"],
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
-    "rides": ["ride_id", "creator_id", "ride_time", "meetup_location", "destination", "description"],
-    "warnings": ["warn_id", "user_id", "reason", "timestamp"],
-    "logs": ["log_id", "level", "source", "message", "timestamp"]
+    "rides": ["creator_id", "ride_time", "meetup_location", "destination", "description"],
+    "warnings": ["user_id", "reason", "timestamp"],
+    "logs": ["level", "source", "message", "timestamp"],
+    "command_history": ["msg_id", "command", "timestamp"]
 }
+
+logger = logging.getLogger(__name__)
 
 class DB_Credentials:
     def __init__(self, host, user, password, database):
@@ -37,9 +40,6 @@ class Session:
             self.cursor.execute(f"SELECT to_regclass('public.{table}')")
             if not self.cursor.fetchone()[0]:
                 self.cursor.execute(f"CREATE TABLE {table} ({', '.join([f'{i} VARCHAR(255)' for i in tables[table]])})")
-                # make first column of each table primary key and autoincrement
-                self.cursor.execute(f"ALTER TABLE {table} ADD PRIMARY KEY ({tables[table][0]})")
-                self.cursor.execute(f"ALTER TABLE {table} ALTER COLUMN {tables[table][0]} SET GENERATED ALWAYS AS IDENTITY")
                 self.conn.commit()
 
 
@@ -98,6 +98,16 @@ class Session:
 
     def rm_user(self, user_id):
         self.cursor.execute(f"DELETE FROM users WHERE id = '{user_id}'")
+        self.conn.commit()
+
+    def get_user(self, user_id):
+        self.cursor.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
+        user = self.cursor.fetchone()
+        logger.log(logging.INFO, f"Found user: {user}")
+        return user
+    
+    def update_user(self, user_id, username): # update username by ID
+        self.cursor.execute(f"UPDATE users SET username = '{username}' WHERE id = '{user_id}'")
         self.conn.commit()
 
     def add_message(self, msg_id, user_id, chat_id, content):
