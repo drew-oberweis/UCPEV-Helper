@@ -19,9 +19,9 @@ class Ride:
         # convert unix timestamp into mm/dd/yyyy format
         logger.log(logging.DEBUG, f"Ride date: {self.date}")
         if (self.type == "Short" or self.type == "Long"):
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\nDestination: {self.destination}\nDescription: {self.description}"
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\nDestination: {self.destination}\n\n{self.description}"
         else:
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\nDescription: {self.description}" # skip destination for I2S and Other rides
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\n\n{self.description}" # skip destination for I2S and Other rides
         
     def str_one_line(self):
         if (self.type == "Short" or self.type == "Long"):
