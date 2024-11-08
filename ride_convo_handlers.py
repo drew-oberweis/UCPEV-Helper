@@ -314,6 +314,8 @@ class Ride_Modify_Functions:
 
         await update.message.reply_text(f"Modifying {this_mod.get_field()} to {this_mod.get_new_value()}")
 
+        return ConversationHandler.END
+
     async def delete_ride(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if update.message.text == "/cancel":
             await update.message.reply_text("Ride modification cancelled.")

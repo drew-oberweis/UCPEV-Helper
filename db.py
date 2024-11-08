@@ -120,17 +120,17 @@ class Session:
         ride.set_time(ride_str_list[5])
         ride.set_meetup(ride_str_list[7])
 
+        logger.log(logging.DEBUG, ride_str_list)
+
         if(ride_str_list[0] == "Short" or ride_str_list[0] == "Long"):
             ride.set_destination(ride_str_list[9])
-            ride.set_description(" ".join(ride_str_list[10:]))
-        else:
-            ride.set_description(" ".join(ride_str_list[8:]))
 
-        # confirm that ride exists in database
+        # confirm that ride exists in database, and pull it's id and description
         rides = self.get_rides()
         for r in rides:
             if r.str_one_line() == ride.str_one_line():
-                ride.id = r.id
+                ride.set_id(r.id)
+                ride.set_description(r.description)
                 return ride
             
         return None
