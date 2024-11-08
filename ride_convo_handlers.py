@@ -126,7 +126,8 @@ class Ride_Helper_Functions:
         global this_ride
         global db_creds
         this_ride.set_description(update.message.text)
-        await update.message.reply_text(f"Description set to {this_ride.description}. Ride creation complete. Complete ride info:\n\n{this_ride}")
+        await update.message.reply_text(f"Description set to {this_ride.description}.")
+        await update.message.reply_text("Ride creation complete. Complete ride info:\n\n{this_ride}")
 
         global db_creds
 
