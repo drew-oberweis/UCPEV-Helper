@@ -96,7 +96,7 @@ class Ride_Helper_Functions:
 
     async def store_date_ask_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
-        unix_date = datetime.datetime.strptime(update.message.text, "%m/%d/%Y").timestamp()
+        unix_date = int(datetime.datetime.strptime(update.message.text, "%m/%d/%Y").timestamp())
         this_ride.set_date(unix_date)
         await update.message.reply_text(f"Ride date set to {this_ride.nice_date()}. Enter the time of the ride" )
         return Ride_Helper_Functions.TIME
