@@ -11,6 +11,7 @@ ADD db.py /app
 ADD environment_handler.py /app
 ADD custom_handlers.py /app
 ADD ride_convo_handlers.py /app
+ADD ride.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs

@@ -11,7 +11,7 @@ tables = {
     "command_history": ["msg_id", "command", "timestamp"]
 }
 
-from ride_convo_handlers import Ride
+from ride import Ride
 
 logger = logging.getLogger(__name__)
 
@@ -87,14 +87,19 @@ class Session:
         result = self.cursor.fetchall()
 
         rides = []
+
+        logger.log(logging.DEBUG, f"Got {len(result)} rides")
+
         for ride in result:
+
             this_ride = Ride()
-            this_ride.set_type(ride[1])
-            this_ride.set_date(ride[2])
-            this_ride.set_time(ride[3])
-            this_ride.set_meetup(ride[4])
-            this_ride.set_destination(ride[5])
-            this_ride.set_description(ride[6])
+            this_ride.set_id(ride[0])
+            this_ride.set_type(ride[2])
+            this_ride.set_date(int(float(ride[3])))
+            this_ride.set_time(ride[4])
+            this_ride.set_meetup(ride[5])
+            this_ride.set_destination(ride[6])
+            this_ride.set_description(ride[7])
             rides.append(this_ride)
             this_ride = None
 
@@ -102,6 +107,33 @@ class Session:
             rides = rides[:limit]
 
         return rides
+    
+    def get_ride_by_str(self, ride_str):
+        ride = Ride()
+
+        ride_str_list = ride_str.split(" ")
+
+        date_timestamp = int(datetime.strptime(ride_str_list[3], "%m/%d/%Y").timestamp())
+
+        ride.set_type(ride_str_list[0])
+        ride.set_date(date_timestamp)
+        ride.set_time(ride_str_list[5])
+        ride.set_meetup(ride_str_list[7])
+
+        if(ride_str_list[0] == "Short" or ride_str_list[0] == "Long"):
+            ride.set_destination(ride_str_list[9])
+            ride.set_description(" ".join(ride_str_list[10:]))
+        else:
+            ride.set_description(" ".join(ride_str_list[8:]))
+
+        # confirm that ride exists in database
+        rides = self.get_rides()
+        for r in rides:
+            if r.str_one_line() == ride.str_one_line():
+                ride.id = r.id
+                return ride
+            
+        return None
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:
@@ -130,6 +162,10 @@ class Session:
         self.cursor.execute(f"UPDATE users SET is_admin = '{is_admin}' WHERE id = '{user_id}'")
         self.conn.commit()
 
+    def update(self, ride, ride_id, field, value):
+        self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
+        self.conn.commit()
+
     def add_message(self, msg_id, user_id, chat_id, content):
         self.cursor.execute(f"INSERT INTO messages (msg_id, user_id, chat_id, timestamp, content) VALUES ('{msg_id}', '{user_id}', '{chat_id}', '{datetime.now()}', '{content}')")
         self.conn.commit()
@@ -141,11 +177,16 @@ class Session:
     def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description):
         # random 20 digit number for ID, pray for no collisions
         ride_id = random.randint(0, 99999999999999999999)
+        ride_date = int(ride_date)
         self.cursor.execute(f"INSERT INTO rides (ride_id, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description) VALUES ('{ride_id}', '{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
         self.conn.commit()
 
     def rm_ride(self, ride_id):
         self.cursor.execute(f"DELETE FROM rides WHERE ride_id = '{ride_id}'")
+        self.conn.commit()
+
+    def update_ride(self, ride_id, field, value):
+        self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
     def add_warning(self, user_id, reason):

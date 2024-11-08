@@ -1,3 +1,4 @@
+clear
 docker build --tag drewoberweis/ucpevbot .
 docker stop ucpevbot_testing
 docker rm ucpevbot_testing

@@ -76,6 +76,7 @@ def main():
 
     app.add_handler(ChatMemberHandler(simple_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(ride_convo_handlers.ride_add_conv_handler)
+    app.add_handler(ride_convo_handlers.modify_ride_conv_handler)
     app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
     command_list = utils.output_telegram_autocomplete()

@@ -115,6 +115,11 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     rides = session.get_rides(ride_time_after=curtime)
 
+    # if rides is empty, return a message saying so
+    if not rides:
+        await send_message(update, context, "There are no upcoming rides.")
+        return
+
     divider = "----------------"
 
     rides_msg = ""
