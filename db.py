@@ -1,16 +1,17 @@
 import psycopg2
 from datetime import datetime
 import logging
+import random
 
 tables = {
     "users": ["username", "id", "is_admin"],
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
-    "rides": ["creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description"],
+    "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description"],
     "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"]
 }
 
-from ride_convo_handler import Ride
+from ride_convo_handlers import Ride
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ class Session:
             self.cursor.execute("SELECT * FROM messages")
         return self.cursor.fetchall()
     
-    def get_rides(self, creator_id=None, ride_time_after=None):
+    def get_rides(self, creator_id=None, ride_time_after=None, limit=None):
         if creator_id:
             logger.log(logging.DEBUG, f"Getting rides for {creator_id}")
             self.cursor.execute(f"SELECT * FROM rides WHERE creator_id = '{creator_id}'")
@@ -96,6 +97,9 @@ class Session:
             this_ride.set_description(ride[6])
             rides.append(this_ride)
             this_ride = None
+
+        if(limit):
+            rides = rides[:limit]
 
         return rides
     
@@ -135,7 +139,9 @@ class Session:
         self.conn.commit()
 
     def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description):
-        self.cursor.execute(f"INSERT INTO rides (creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description) VALUES ('{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
+        # random 20 digit number for ID, pray for no collisions
+        ride_id = random.randint(0, 99999999999999999999)
+        self.cursor.execute(f"INSERT INTO rides (ride_id, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description) VALUES ('{ride_id}', '{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
         self.conn.commit()
 
     def rm_ride(self, ride_id):

@@ -42,6 +42,11 @@ async def is_admin(user: User):
 
     status = db_user[2]
 
+    if status == "True":
+        status = True
+    else:
+        status = False
+
     logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
     return status
 

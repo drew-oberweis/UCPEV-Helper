@@ -115,8 +115,13 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     rides = session.get_rides(ride_time_after=curtime)
 
+    divider = "----------------"
+
     rides_msg = ""
     for ride in rides:
-        rides_msg += f"{ride}\n----------------\n"
+        rides_msg += f"{ride}\n{divider}\n"
+
+    # cut off bottom line
+    rides_msg = rides_msg[:-len(divider)-1]
 
     await send_message(update, context, f"Upcoming rides:\n\n{rides_msg}")

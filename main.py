@@ -23,7 +23,7 @@ import db
 import environment_handler
 import custom_handlers as c_handlers
 import utils
-import ride_convo_handler
+import ride_convo_handlers
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -75,7 +75,7 @@ def main():
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(simple_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-    app.add_handler(ride_convo_handler.ride_add_conv_handler)
+    app.add_handler(ride_convo_handlers.ride_add_conv_handler)
     app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
     command_list = utils.output_telegram_autocomplete()
