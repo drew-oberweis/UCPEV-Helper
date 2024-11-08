@@ -91,7 +91,7 @@ class Ride_Helper_Functions:
     async def store_type_ask_date(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_type(update.message.text)
-        await update.message.reply_text(f"Ride type set to {this_ride.type}. Enter the date of the ride")
+        await update.message.reply_text(f"Ride type set to {this_ride.type}. Enter the date of the ride (MUST BE IN MM/DD/YYYY FORMAT, including zeroes for single digits)")
         return Ride_Helper_Functions.DATE
 
     async def store_date_ask_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
