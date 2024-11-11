@@ -24,3 +24,20 @@ def get_env_vars():
 def get_discord_webhook():
     load_dotenv()
     return os.getenv("discord_webhook")
+
+def get_log_level():
+    load_dotenv()
+    raw =  os.getenv("log_level")
+
+    if raw == "DEBUG":
+        return logging.DEBUG
+    elif raw == "INFO":
+        return logging.INFO
+    elif raw == "WARNING":
+        return logging.WARNING
+    elif raw == "ERROR":
+        return logging.ERROR
+    elif raw == "CRITICAL":
+        return logging.CRITICAL
+    else:
+        return logging.INFO # info should be default

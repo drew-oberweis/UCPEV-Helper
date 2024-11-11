@@ -68,6 +68,7 @@ class Ride_Helper_Functions:
         # check if the user is in a group chat
         if update.effective_chat.type == "group" or update.effective_chat.type == "supergroup":
             await update.message.reply_text("This command can only be used in a private chat.")
+            logger.log(logging.INFO, f"User {update.effective_user.id} attempted to use command add_ride in a group chat")
             return ConversationHandler.END
 
         # make sure the user is an admin
@@ -79,7 +80,7 @@ class Ride_Helper_Functions:
 
         reply_keyboard = [[i for i in Ride.ride_type_options]]
 
-        logger.log(logging.DEBUG, "Available keyboard options: %s", reply_keyboard)
+        logger.log(logging.DEBUG, f"User {update.effective_user.id} started ride creation process")
 
         await update.message.reply_text("Beginning ride creation process. Follow all prompts to add a ride, or type /cancel to exit.\n\nSelect ride type", 
                                         reply_markup=ReplyKeyboardMarkup(reply_keyboard, 
@@ -91,6 +92,7 @@ class Ride_Helper_Functions:
     async def store_type_ask_date(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_type(update.message.text)
+        logger.log(logging.DEBUG, f"Ride type set to {this_ride.type} by {update.effective_user.id}")
         await update.message.reply_text(f"Ride type set to {this_ride.type}. Enter the date of the ride (MUST BE IN MM/DD/YYYY FORMAT, including zeroes for single digits)")
         return Ride_Helper_Functions.DATE
 
@@ -98,12 +100,14 @@ class Ride_Helper_Functions:
         global this_ride
         unix_date = int(datetime.datetime.strptime(update.message.text, "%m/%d/%Y").timestamp())
         this_ride.set_date(unix_date)
+        logger.log(logging.DEBUG, f"Ride date set to {this_ride.date} by {update.effective_user.id}")
         await update.message.reply_text(f"Ride date set to {this_ride.nice_date()}. Enter the time of the ride" )
         return Ride_Helper_Functions.TIME
 
     async def store_time_ask_meetup(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_time(update.message.text)
+        logger.log(logging.DEBUG, f"Ride time set to {this_ride.time} by {update.effective_user.id}")
         await update.message.reply_text(f"Ride time set to {this_ride.time}. Enter the meetup location")
         return Ride_Helper_Functions.MEETUP
 
@@ -111,14 +115,17 @@ class Ride_Helper_Functions:
         global this_ride
         this_ride.set_meetup(update.message.text)
         if(this_ride.type == "I2S" or this_ride.type == "Other"):
+            logger.log(logging.DEBUG, f"Ride meetup location set to {this_ride.meetup_location} by {update.effective_user.id}")
             await update.message.reply_text(f"Meetup location set to {this_ride.meetup_location}. Enter a description of the ride")
             return Ride_Helper_Functions.DESCRIPTION
+        logger.log(logging.DEBUG, f"Ride meetup location set to {this_ride.meetup_location} by {update.effective_user.id}")
         await update.message.reply_text(f"Meetup location set to {this_ride.meetup_location}. Enter the destination")
         return Ride_Helper_Functions.DESTINATION
 
     async def store_destination_ask_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_destination(update.message.text)
+        logger.log(logging.DEBUG, f"Ride destination set to {this_ride.destination} by {update.effective_user.id}")
         await update.message.reply_text(f"Destination set to {this_ride.destination}. Enter a description of the ride")
         return Ride_Helper_Functions.DESCRIPTION
 
@@ -126,6 +133,7 @@ class Ride_Helper_Functions:
         global this_ride
         global db_creds
         this_ride.set_description(update.message.text)
+        logger.log(logging.DEBUG, f"Ride description set to {this_ride.description} by {update.effective_user.id}")
         await update.message.reply_text(f"Description set to {this_ride.description}.")
         await update.message.reply_text("Ride creation complete. Complete ride info:\n\n{this_ride}")
 
@@ -136,11 +144,14 @@ class Ride_Helper_Functions:
 
         session.add_ride(update.effective_user.id, this_ride.type, this_ride.date, this_ride.time, this_ride.meetup_location, this_ride.destination, this_ride.description)
 
+        logger.log(logging.INFO, f"Ride added by user {update.effective_user.id}: \n{this_ride}")
+
         this_ride = None
 
         return ConversationHandler.END
 
     async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        logger.log(logging.DEBUG, f"Ride creation cancelled by user {update.effective_user.id}")
         await update.message.reply_text("Ride creation cancelled.")
         return ConversationHandler.END
 
@@ -233,6 +244,7 @@ class Ride_Modify_Functions:
 
         if update.message.text == "/cancel":
             await update.message.reply_text("Ride modification cancelled.")
+            logger.log(logging.DEBUG, f"Ride modification cancelled by user {update.effective_user.id}")
             return ConversationHandler.END
         
         this_mod = ModifyRideMemory()
@@ -243,7 +255,10 @@ class Ride_Modify_Functions:
 
         if this_mod.get_ride() == None:
             await update.message.reply_text("Invalid ride. Please select a ride from the list.")
+            logger.log(logging.DEBUG, f"Invalid ride selected by user {update.effective_user.id}")
             return Ride_Modify_Functions.SELECT
+        
+        logger.log(logging.DEBUG, f"User {update.effective_user.id} selected ride: {this_mod.get_ride()}")
         
         await update.message.reply_text(f"Selected ride:\n{this_mod.get_ride()}\n\nSelect an action to perform on this ride", 
                                         reply_markup=ReplyKeyboardMarkup([["Modify", "Delete"]],
@@ -254,15 +269,18 @@ class Ride_Modify_Functions:
     async def read_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if update.message.text == "/cancel":
             await update.message.reply_text("Ride modification cancelled.")
+            logger.log(logging.DEBUG, f"Ride modification cancelled by user {update.effective_user.id}")
             return ConversationHandler.END
 
         if update.message.text == "Modify":
+            logger.log(logging.DEBUG, f"User {update.effective_user.id} selected Modify")
             await update.message.reply_text("Select parameter to modify",
                                             reply_markup=ReplyKeyboardMarkup(Ride_Modify_Functions.mod_options_keyboard,
                                                                              one_time_keyboard=True,
                                                                             input_field_placeholder="Select a parameter to modify"))
             return Ride_Modify_Functions.MODOPTIONS
         elif update.message.text == "Delete":
+            logger.log(logging.DEBUG, f"User {update.effective_user.id} selected Delete")
             yesno_keyboard = [["Yes", "No"]]
             await update.message.reply_text("Are you sure you want to delete this ride? (yes/no)",
                                             reply_markup=ReplyKeyboardMarkup(yesno_keyboard,
@@ -271,6 +289,7 @@ class Ride_Modify_Functions:
             return Ride_Modify_Functions.DELETE
         else:
             await update.message.reply_text("Invalid action. Please select an action from the list.")
+            logger.log(logging.DEBUG, f"Invalid action selected by user {update.effective_user.id}")
             return Ride_Modify_Functions.ACTION
         
     async def mod_options(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -280,10 +299,13 @@ class Ride_Modify_Functions:
 
         if update.message.text not in ["Type", "Date", "Time", "Meetup location", "Destination", "Description"]:
             await update.message.reply_text("Invalid option. Please select a valid option from the list.")
+            logger.log(logging.DEBUG, f"Invalid modifiction option selected by user {update.effective_user.id}")
             return Ride_Modify_Functions.MODOPTIONS
         
         global this_mod
         this_mod.set_field(update.message.text)
+
+        logger.log(logging.DEBUG, f"User {update.effective_user.id} selected {this_mod.get_field()} to modify")
 
         await update.message.reply_text(f"Enter new value for {update.message.text}")
         return Ride_Modify_Functions.MODIFY
@@ -311,6 +333,8 @@ class Ride_Modify_Functions:
             session.update_ride(this_mod.get_ride().id, "destination", this_mod.get_new_value())
         elif this_mod.get_field() == "Description":
             session.update_ride(this_mod.get_ride().id, "description", this_mod.get_new_value())
+
+        logger.log(logging.DEBUG, f"User {update.effective_user.id} modified {this_mod.get_field()} to {this_mod.get_new_value()}")
 
         await update.message.reply_text(f"Modifying {this_mod.get_field()} to {this_mod.get_new_value()}")
 
