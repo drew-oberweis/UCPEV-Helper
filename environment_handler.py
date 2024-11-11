@@ -40,4 +40,5 @@ def get_log_level():
     elif raw == "CRITICAL":
         return logging.CRITICAL
     else:
+        logger.warning("Invalid log level or no log level present in environment variables. Defaulting to INFO.")
         return logging.INFO # info should be default

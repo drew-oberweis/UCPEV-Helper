@@ -112,8 +112,10 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     session = db.Session(db_creds)
     curtime = datetime.datetime.now().timestamp()
+    yesterday = curtime - 86400
+    
 
-    rides = session.get_rides(ride_time_after=curtime)
+    rides = session.get_rides(ride_time_after=yesterday)
 
     # if rides is empty, return a message saying so
     if not rides:

@@ -135,7 +135,7 @@ class Ride_Helper_Functions:
         this_ride.set_description(update.message.text)
         logger.log(logging.DEBUG, f"Ride description set to {this_ride.description} by {update.effective_user.id}")
         await update.message.reply_text(f"Description set to {this_ride.description}.")
-        await update.message.reply_text("Ride creation complete. Complete ride info:\n\n{this_ride}")
+        await update.message.reply_text(f"Ride creation complete. Complete ride info:\n\n{this_ride}")
 
         global db_creds
 
