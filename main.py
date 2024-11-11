@@ -30,10 +30,12 @@ log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special
 
 # set higher logging level for httpx to avoid all GET and POST requests being logged
-# idk what this does but the example used it and it works so I'm keeping it
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
 logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext.Application").setLevel(logging.WARNING)
+logging.getLogger("httpcore.connection").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext.Updater").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ db_creds = db.DB_Credentials(
     database=os.getenv("postgres_db", None)
 )
 
-log_level = logging.DEBUG
+log_level = environment_handler.get_log_level()
 logging.basicConfig(format=log_format, level=log_level, stream=sys.stdout)
 
 commands_map = {
