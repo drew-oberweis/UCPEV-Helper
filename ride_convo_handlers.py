@@ -220,9 +220,10 @@ class Ride_Modify_Functions:
             return ConversationHandler.END
 
         current_timestamp = datetime.datetime.now().timestamp()
+        yesterday = current_timestamp - 86400
 
         session = db.Session(db_creds)
-        rides = session.get_rides(limit=5, ride_time_after=current_timestamp)
+        rides = session.get_rides(limit=5, ride_time_after=yesterday)
 
         ride_names = []
 
