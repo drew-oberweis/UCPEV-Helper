@@ -10,7 +10,8 @@ command_descriptions = {
     "help": "Sends a list of commands",
     "pads": "Sends a list of recommended pads",
     "i2s": "Sends a message about Intro 2 Speed",
-    "rides": "Sends a list of upcoming rides"
+    "rides": "Sends a list of upcoming rides",
+    "inline": "Sends information about collab rides with Inline Insomniacs"
 }
 
 admin_command_descriptions = {
@@ -47,5 +48,6 @@ responses = { # Eventually, this will all be pulled from a database editable on 
             <a href='https://www.ruroc.com/en/'>Ruroc</a>
             """,
     "pads": "TSG, G-Form, Revzilla\n\n<a href='https://g-form.com/'>GForm</a>\n<a href='https://www.revzilla.com'>Revzilla</a>",
-    "i2s": "Intro 2 Speed (I2S) is an event where new and experienced riders can practice together and learn new skills. It is a great way to meet other riders and learn how to ride safely. We try to hold I2S every week at lot E14 when weather permits, but it occasionally gets moved, so keep up to date using /rides!"
+    "i2s": "Intro 2 Speed (I2S) is an event where new and experienced riders can practice together and learn new skills. It is a great way to meet other riders and learn how to ride safely. We try to hold I2S every week at lot E14 when weather permits, but it occasionally gets moved, so keep up to date using /rides!",
+    "inline": "Inline Insomniacs (Inline) is another RSO on campus that we occasionally collaborate with for rides. They ride non-electric skateboards/longboards/skates, so rides with them are usually a slower pace and it is important that we are respectful of this. Make sure to not ride too fast or aggressively, and be sure to communicate with other riders. PEV's historically haven't been allowed to ride with them, and we want to keep this privilege, so please be respectful and follow their rules."
 }
