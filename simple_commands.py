@@ -33,7 +33,8 @@ Eventually all of these responses should pull dynamically from the database to a
 
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
     logger.debug(f"Sending message: {message}")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+    # reply to the message that called this command
+    await update.message.reply_text(message, parse_mode=ParseMode.HTML)
     return
 
 async def links(update: Update, context: ContextTypes.DEFAULT_TYPE):
