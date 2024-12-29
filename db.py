@@ -58,7 +58,6 @@ class Session:
             return func(self, *args, **kwargs)
         return wrapper
 
-
     def execute(self, command):
         result = self.cursor.execute(command)
         self.conn.commit()
