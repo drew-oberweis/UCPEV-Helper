@@ -14,6 +14,25 @@ class Ride:
         self.destination = ""
         self.description = ""
         self.id = ""
+    
+    # allow a ride to be compared to another, with the comparison being based on the ride date
+    def __lt__(self, other):
+        return self.date < other.date
+    
+    def __eq__(self, other):
+        return self.date == other.date
+    
+    def __gt__(self, other):
+        return self.date > other.date
+    
+    def __le__(self, other):
+        return self.date <= other.date
+    
+    def __ge__(self, other):
+        return self.date >= other.date
+    
+    def __ne__(self, other):
+        return self.date != other.date
 
     def __desanitize(self, string):
         if(type(string) != str):

@@ -125,6 +125,9 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     divider = "----------------"
 
+    # sort rides
+    rides.sort()
+
     rides_msg = ""
     for ride in rides:
         rides_msg += f"{ride}\n{divider}\n"
