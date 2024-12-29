@@ -44,6 +44,20 @@ class Session:
                 self.cursor.execute(f"CREATE TABLE {table} ({', '.join([f'{i} VARCHAR(255)' for i in tables[table]])})")
                 self.conn.commit()
 
+    def __sanitize(self, string):
+        if(type(string) != str):
+            return string
+        if(string == None):
+            return string
+        return string.replace("'", "''")
+    
+    def sanitize(func):
+        def wrapper(self, *args, **kwargs):
+            args = [self.__sanitize(i) for i in args]
+            kwargs = {k: self.__sanitize(v) for k, v in kwargs.items()}
+            return func(self, *args, **kwargs)
+        return wrapper
+
 
     def execute(self, command):
         result = self.cursor.execute(command)
@@ -166,6 +180,7 @@ class Session:
         self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
+    @sanitize
     def add_message(self, msg_id, user_id, chat_id, content):
         self.cursor.execute(f"INSERT INTO messages (msg_id, user_id, chat_id, timestamp, content) VALUES ('{msg_id}', '{user_id}', '{chat_id}', '{datetime.now()}', '{content}')")
         self.conn.commit()
@@ -174,7 +189,11 @@ class Session:
         self.cursor.execute(f"DELETE FROM messages WHERE msg_id = '{msg_id}'")
         self.conn.commit()
 
+    @sanitize
     def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description):
+        meetup_location = self.__sanitize(meetup_location)
+        destination = self.__sanitize(destination)
+        description = self.__sanitize(description)
         # random 20 digit number for ID, pray for no collisions
         ride_id = random.randint(0, 99999999999999999999)
         ride_date = int(ride_date)
@@ -189,11 +208,16 @@ class Session:
         self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
+    @sanitize
     def add_warning(self, user_id, reason):
+        user_id = self.__sanitize(user_id)
+        reason = self.__sanitize(reason)
         self.cursor.execute(f"INSERT INTO warnings (user_id, reason, timestamp) VALUES ('{user_id}', '{reason}', '{datetime.now()}')")
         self.conn.commit()
 
+    @sanitize
     def rm_warning(self, warn_id):
+        warn_id = self.__sanitize(warn_id)
         self.cursor.execute(f"DELETE FROM warnings WHERE warn_id = '{warn_id}'")
         self.conn.commit()
 
