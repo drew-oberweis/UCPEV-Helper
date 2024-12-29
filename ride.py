@@ -15,13 +15,20 @@ class Ride:
         self.description = ""
         self.id = ""
 
+    def __desanitize(self, string):
+        if(type(string) != str):
+            return string
+        if(string == None):
+            return string
+        return string.replace("''", "'")
+
     def __str__(self):
         # convert unix timestamp into mm/dd/yyyy format
         logger.log(logging.DEBUG, f"Ride date: {self.date}")
         if (self.type == "Short" or self.type == "Long"):
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\nDestination: {self.destination}\n\n{self.description}"
+            return f"Ride type: {self.__desanitize(self.type)}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\nDestination: {self.__desanitize(self.destination)}\n\n{self.__desanitize(self.description)}"
         else:
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.time}\nMeetup: {self.meetup_location}\n\n{self.description}" # skip destination for I2S and Other rides
+            return f"Ride type: {self.__desanitize(self.type)}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
         
     def str_one_line(self):
         if (self.type == "Short" or self.type == "Long"):
