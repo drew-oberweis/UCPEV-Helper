@@ -16,6 +16,7 @@ from telegram.constants import ParseMode
 import data
 import db
 import ride
+from utils import send_message
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -30,13 +31,6 @@ This file contains simple commands that provide a canned response, with no secon
 No database interaction until I stop being lazy and implement it.
 Eventually all of these responses should pull dynamically from the database to allow updates without code changes.
 """
-
-
-async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
-    logger.debug(f"Sending message: {message}")
-    # reply to the message that called this command
-    await update.message.reply_text(message, parse_mode=ParseMode.HTML)
-    return
 
 async def links(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Links command called")

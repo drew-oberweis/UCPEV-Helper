@@ -17,6 +17,10 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
+from telegram.constants import (
+    ParseMode,
+)
+
 import db
 from discord_webhook import DiscordWebhook
 import data
@@ -95,3 +99,9 @@ def output_telegram_autocomplete():
 
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
+
+async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
+    logger.debug(f"Sending message: {message}")
+    # reply to the message that called this command
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+    return
