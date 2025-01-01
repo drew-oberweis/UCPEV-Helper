@@ -80,6 +80,11 @@ async def i2s(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_message(update, context, responses["i2s"])
     return
 
+async def inline(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.debug("Inline command called")
+    await send_message(update, context, responses["inline"])
+    return
+
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Help command called")
     help_msg = "Here are the commands you can use:\n"
