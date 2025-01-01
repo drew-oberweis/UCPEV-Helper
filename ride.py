@@ -12,6 +12,7 @@ class Ride:
         self.time = ""
         self.meetup_location = ""
         self.destination = ""
+        self.pace = "" 
         self.description = ""
         self.id = ""
     
@@ -45,9 +46,9 @@ class Ride:
         # convert unix timestamp into mm/dd/yyyy format
         logger.log(logging.DEBUG, f"Ride date: {self.date}")
         if (self.type == "Short" or self.type == "Long"):
-            return f"Ride type: {self.__desanitize(self.type)}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\nDestination: {self.__desanitize(self.destination)}\n\n{self.__desanitize(self.description)}"
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\nDestination: {self.__desanitize(self.destination)}\nPace: {self.pace}\n\n{self.__desanitize(self.description)}"
         else:
-            return f"Ride type: {self.__desanitize(self.type)}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
         
     def str_one_line(self):
         if (self.type == "Short" or self.type == "Long"):
@@ -75,5 +76,8 @@ class Ride:
         self.description = description
     def set_id(self, ride_id):
         self.id = ride_id
+    def set_pace(self, pace):  
+        self.pace = pace
 
     ride_type_options = ["Short", "Long", "I2S", "Other"]
+    ride_pace_options = ["Casual", "Fast", "Both (Separate rides)"]
