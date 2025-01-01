@@ -201,6 +201,7 @@ class Ride_Modify_Functions:
     - time
     - meetup location
     - destination
+    - pace
     - description
 
     Flow:
@@ -214,7 +215,8 @@ class Ride_Modify_Functions:
     mod_options_keyboard = [
         ["Type", "Date"],
         ["Time", "Meetup location"],
-        ["Destination", "Description"]
+        ["Destination", "Description"],
+        ["Pace", "Cancel"]
     ]
 
     async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -297,13 +299,17 @@ class Ride_Modify_Functions:
             await update.message.reply_text("Ride modification cancelled.")
             return ConversationHandler.END
 
-        if update.message.text not in ["Type", "Date", "Time", "Meetup location", "Destination", "Description"]:
+        if update.message.text not in ["Type", "Date", "Time", "Meetup location", "Destination", "Pace", "Description", "Cancel"]:
             await update.message.reply_text("Invalid option. Please select a valid option from the list.")
             logger.log(logging.DEBUG, f"Invalid modifiction option selected by user {update.effective_user.id}")
             return Ride_Modify_Functions.MODOPTIONS
         
         global this_mod
         this_mod.set_field(update.message.text)
+
+        if(update.message.text == "Cancel"):
+            await update.message.reply_text("Ride modification cancelled.")
+            return ConversationHandler.END
 
         logger.log(logging.DEBUG, f"User {update.effective_user.id} selected {this_mod.get_field()} to modify")
 
@@ -320,6 +326,8 @@ class Ride_Modify_Functions:
 
         session = db.Session(db_creds)
 
+        # These should REALLY be checking to see if the the new value is valid, but I will add that later.
+
         if this_mod.get_field() == "Type":
             session.update_ride(this_mod.get_ride().id, "type", this_mod.get_new_value())
         elif this_mod.get_field() == "Date":
@@ -331,6 +339,8 @@ class Ride_Modify_Functions:
             session.update_ride(this_mod.get_ride().id, "meetup_location", this_mod.get_new_value())
         elif this_mod.get_field() == "Destination":
             session.update_ride(this_mod.get_ride().id, "destination", this_mod.get_new_value())
+        elif this_mod.get_field() == "Pace":
+            session.update_ride(this_mod.get_ride().id, "pace", this_mod.get_new_value())
         elif this_mod.get_field() == "Description":
             session.update_ride(this_mod.get_ride().id, "description", this_mod.get_new_value())
 
