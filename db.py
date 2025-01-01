@@ -112,6 +112,7 @@ class Session:
             this_ride.set_time(ride[4])
             this_ride.set_meetup(ride[5])
             this_ride.set_destination(ride[6])
+            this_ride.set_pace(ride[8])
             this_ride.set_description(ride[7])
             rides.append(this_ride)
             this_ride = None
