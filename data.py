@@ -1,5 +1,5 @@
 commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads", "rides"]
-admin_commands = ["test_admin", "announce", "add_ride", "modify_ride"]
+admin_commands = ["test_admin", "announce", "add_ride", "modify_ride", "make_ride_poll"]
 
 command_descriptions = {
     "nosedive": "Sends a link to a nosedive video",
@@ -17,7 +17,8 @@ admin_command_descriptions = {
     "test_admin": "Tests if the user is an admin",
     "announce": "Announces a message to the group and mirror it in the Discord",
     "add_ride": "Adds a ride to the list of rides",
-    "modify_ride": "Modifies a ride in the list of rides"
+    "modify_ride": "Modifies a ride in the list of rides",
+    "make_ride_poll": "Makes a poll for the next ride (or a selected ride)"
 }
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
