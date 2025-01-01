@@ -15,6 +15,7 @@ from telegram.ext import (
 from telegram.constants import ParseMode
 import data
 import db
+import ride
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -128,9 +129,19 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # sort rides
     rides.sort()
 
+    # include ride ID in message if user is an admin
+    include_id = utils.is_admin(update.effective_user)
+    # but don't if the user is the bot
+    if update.effective_user.id == context.bot.id:
+        include_id = False
+
     rides_msg = ""
-    for ride in rides:
-        rides_msg += f"{ride}\n{divider}\n"
+    if (include_id):
+        for ride in rides:
+            rides_msg += f"{ride}\n{ride.id}\n{divider}\n"
+    else:
+        for ride in rides:
+            rides_msg += f"{ride}\n{divider}\n"
 
     # cut off bottom line
     rides_msg = rides_msg[:-len(divider)-1]
