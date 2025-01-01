@@ -100,6 +100,20 @@ class Session:
             self.cursor.execute("SELECT * FROM messages")
         return self.cursor.fetchall()
     
+    def get_ride(self, ride_id): # returns the ride object, or the next ride if ride_id is None
+        # make sure to get the next ride *after* the current time
+        if ride_id:
+            self.cursor.execute(f"SELECT * FROM rides WHERE ride_id = '{ride_id}' AND ride_date > '{datetime.now().timestamp()} ORDER BY ride_date ASC LIMIT 1'")
+        else:
+            self.cursor.execute(f"SELECT * FROM rides WHERE ride_date > '{datetime.now().timestamp()}' ORDER BY ride_date ASC LIMIT 1")
+        ride = self.cursor.fetchone()
+
+        if not ride:
+            return None
+
+        this_ride = self.__deserialize(ride)
+        return this_ride
+    
     def get_rides(self, creator_id=None, ride_time_after=None, limit=None):
         if creator_id:
             logger.log(logging.DEBUG, f"Getting rides for {creator_id}")
