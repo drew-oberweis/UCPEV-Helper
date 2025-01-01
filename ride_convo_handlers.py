@@ -49,6 +49,11 @@ for i in Ride.ride_type_options:
     ride_type_regex += i + "|"
 ride_type_regex = ride_type_regex[:-1] + ")$"
 
+ride_pace_regex = "^("
+for i in Ride.ride_pace_options:
+    ride_pace_regex += i + "|"
+ride_pace_regex = ride_pace_regex[:-1] + ")$"
+
 regex_all = "^(?!/cancel).*$" # match anything except /cancel
 regex_date = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$"
 
@@ -57,7 +62,7 @@ global this_mod
 
 class Ride_Helper_Functions:
 
-    TYPE, DATE, TIME, MEETUP, DESTINATION, DESCRIPTION = range(6)
+    TYPE, DATE, TIME, MEETUP, DESTINATION, PACE, DESCRIPTION = range(7)
 
     async def add_ride(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.log(logging.DEBUG, "Add ride command called")
@@ -78,12 +83,13 @@ class Ride_Helper_Functions:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
             return ConversationHandler.END
 
-        reply_keyboard = [[i for i in Ride.ride_type_options]]
+        ride_type_keyboard = [[i for i in Ride.ride_type_options]]
+        ride_pace_keyboard = [[i for i in Ride.ride_pace_options]]
 
         logger.log(logging.DEBUG, f"User {update.effective_user.id} started ride creation process")
 
         await update.message.reply_text("Beginning ride creation process. Follow all prompts to add a ride, or type /cancel to exit.\n\nSelect ride type", 
-                                        reply_markup=ReplyKeyboardMarkup(reply_keyboard, 
+                                        reply_markup=ReplyKeyboardMarkup(ride_type_keyboard, 
                                                                         one_time_keyboard=True, 
                                                                         input_field_placeholder="Select a ride type"))
 
@@ -114,19 +120,29 @@ class Ride_Helper_Functions:
     async def store_meetup_ask_destination(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_meetup(update.message.text)
-        if(this_ride.type == "I2S" or this_ride.type == "Other"):
+        if(this_ride.type == "I2S" or this_ride.type == "Other"): # skip destination and pace for I2S and Other rides
             logger.log(logging.DEBUG, f"Ride meetup location set to {this_ride.meetup_location} by {update.effective_user.id}")
             await update.message.reply_text(f"Meetup location set to {this_ride.meetup_location}. Enter a description of the ride")
             return Ride_Helper_Functions.DESCRIPTION
         logger.log(logging.DEBUG, f"Ride meetup location set to {this_ride.meetup_location} by {update.effective_user.id}")
-        await update.message.reply_text(f"Meetup location set to {this_ride.meetup_location}. Enter the destination")
+        await update.message.reply_text(f"Meetup location set to {this_ride.meetup_location}. Enter the destination of the ride")
         return Ride_Helper_Functions.DESTINATION
-
-    async def store_destination_ask_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    async def store_destination_ask_pace(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
         this_ride.set_destination(update.message.text)
         logger.log(logging.DEBUG, f"Ride destination set to {this_ride.destination} by {update.effective_user.id}")
-        await update.message.reply_text(f"Destination set to {this_ride.destination}. Enter a description of the ride")
+        await update.message.reply_text(f"Destination set to {this_ride.destination}. Enter the pace of the ride",
+                                        reply_markup=ReplyKeyboardMarkup([[i for i in Ride.ride_pace_options]], 
+                                                                         one_time_keyboard=True, 
+                                                                         input_field_placeholder="Select a pace"))
+        return Ride_Helper_Functions.PACE
+
+    async def store_pace_ask_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        global this_ride
+        this_ride.set_pace(update.message.text)
+        logger.log(logging.DEBUG, f"Ride pace set to {this_ride.pace} by {update.effective_user.id}")
+        await update.message.reply_text(f"Pace set to {this_ride.pace}. Enter a description of the ride")
         return Ride_Helper_Functions.DESCRIPTION
 
     async def store_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -142,7 +158,7 @@ class Ride_Helper_Functions:
         session = db.Session(db_creds)
 
 
-        session.add_ride(update.effective_user.id, this_ride.type, this_ride.date, this_ride.time, this_ride.meetup_location, this_ride.destination, this_ride.description)
+        session.add_ride(update.effective_user.id, this_ride.type, this_ride.date, this_ride.time, this_ride.meetup_location, this_ride.destination, this_ride.pace, this_ride.description)
 
         logger.log(logging.INFO, f"Ride added by user {update.effective_user.id}: \n{this_ride}")
 
@@ -163,7 +179,8 @@ ride_add_conv_handler = ConversationHandler(
             Ride_Helper_Functions.DATE: [MessageHandler(filters.Regex(regex_date), Ride_Helper_Functions.store_date_ask_time)],
             Ride_Helper_Functions.TIME: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_time_ask_meetup)],
             Ride_Helper_Functions.MEETUP: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_meetup_ask_destination)],
-            Ride_Helper_Functions.DESTINATION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_destination_ask_description)],
+            Ride_Helper_Functions.DESTINATION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_destination_ask_pace)],
+            Ride_Helper_Functions.PACE: [MessageHandler(filters.Regex(ride_pace_regex), Ride_Helper_Functions.store_pace_ask_description)],
             Ride_Helper_Functions.DESCRIPTION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_description)]
         },
         fallbacks=[CommandHandler("cancel", Ride_Helper_Functions.cancel)]
