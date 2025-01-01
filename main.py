@@ -36,6 +36,7 @@ logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
 logging.getLogger("telegram.ext.Application").setLevel(logging.WARNING)
 logging.getLogger("httpcore.connection").setLevel(logging.WARNING)
 logging.getLogger("telegram.ext.Updater").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext.ConversationHandler").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
