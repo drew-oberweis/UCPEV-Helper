@@ -6,7 +6,7 @@ import random
 tables = {
     "users": ["username", "id", "is_admin"],
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
-    "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description"],
+    "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description", "pace"],
     "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"]
 }
@@ -189,14 +189,11 @@ class Session:
         self.conn.commit()
 
     @sanitize
-    def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description):
-        meetup_location = self.__sanitize(meetup_location)
-        destination = self.__sanitize(destination)
-        description = self.__sanitize(description)
+    def add_ride(self, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, pace, description):
         # random 20 digit number for ID, pray for no collisions
         ride_id = random.randint(0, 99999999999999999999)
         ride_date = int(ride_date)
-        self.cursor.execute(f"INSERT INTO rides (ride_id, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, description) VALUES ('{ride_id}', '{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{description}')")
+        self.cursor.execute(f"INSERT INTO rides (ride_id, creator_id, ride_type, ride_date, ride_time, meetup_location, destination, pace, description) VALUES ('{ride_id}', '{creator_id}', '{ride_type}', '{ride_date}', '{ride_time}', '{meetup_location}', '{destination}', '{pace}', '{description}')")
         self.conn.commit()
 
     def rm_ride(self, ride_id):
