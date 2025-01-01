@@ -122,7 +122,21 @@ class Session:
 
         return rides
     
-    def get_ride_by_str(self, ride_str):
+    def get_ride_by_id(self, ride_id):
+        self.cursor.execute(f"SELECT * FROM rides WHERE ride_id = '{ride_id}'")
+        result = self.cursor.fetchone()
+        ride = Ride()
+        ride.set_id(result[0])
+        ride.set_type(result[2])
+        ride.set_date(int(float(result[3])))
+        ride.set_time(result[4])
+        ride.set_meetup(result[5])
+        ride.set_destination(result[6])
+        ride.set_pace(result[8])
+        ride.set_description(result[7])
+        return ride
+
+    def get_ride_by_str(self, ride_str): # really broken and currenlty unused. leaving it here for now
         ride = Ride()
 
         ride_str_list = ride_str.split(" ")

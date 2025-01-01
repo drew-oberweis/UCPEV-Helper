@@ -236,25 +236,7 @@ class Ride_Modify_Functions:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
             return ConversationHandler.END
 
-        current_timestamp = datetime.datetime.now().timestamp()
-        yesterday = current_timestamp - 86400
-
-        session = db.Session(db_creds)
-        rides = session.get_rides(limit=5, ride_time_after=yesterday)
-
-        ride_names = []
-
-        for i in rides:
-            ride_names.append(i.str_one_line())
-
-        keyboard_buttons = [ride_names]
-
-        logger.log(logging.DEBUG, "Available keyboard options: %s", keyboard_buttons)
-
-        await update.message.reply_text("Select a ride to modify", 
-                                        reply_markup=ReplyKeyboardMarkup(keyboard_buttons, 
-                                                                         one_time_keyboard=True, 
-                                                                         input_field_placeholder="Select a ride"))
+        await update.message.reply_text("Enter the ID of the ride to modify")
         return Ride_Modify_Functions.ACTION
     
     async def select_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -269,10 +251,10 @@ class Ride_Modify_Functions:
 
         session = db.Session(db_creds)
 
-        this_mod.set_ride(session.get_ride_by_str(ride_str=update.message.text))
+        this_mod.set_ride(session.get_ride_by_id(update.message.text))
 
-        if this_mod.get_ride() == None:
-            await update.message.reply_text("Invalid ride. Please select a ride from the list.")
+        if this_mod.get_ride().__str__() == None:
+            await update.message.reply_text("Invalid ride. Please select a ride using its ID.")
             logger.log(logging.DEBUG, f"Invalid ride selected by user {update.effective_user.id}")
             return Ride_Modify_Functions.SELECT
         
