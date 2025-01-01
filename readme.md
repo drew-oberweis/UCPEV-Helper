@@ -2,7 +2,7 @@ This is a bot for UIUC PEV, a PEV group based in Champaign/Urbana, Illinois.
 
 Command list:
 
- - ride: Displays next scheduled ride [WIP]
+ - rides: Displays the next 5 scheduled rides
  - discounts: Displays a list of discount codes, mostly stolen from ChiPEV
  - help: Displays a list of available commands
  - pads: Links to recommended pads
@@ -11,7 +11,6 @@ Command list:
  - rules: Displays group rules
 
 Admin commands:
- - schedule_ride: Add a scheduled ride [WIP]
- - delete_ride: Remove a scheduled ride [WIP]
- - warn: Warn a user [WIP]
- - warn_remove: Remove a user's warning [WIP]
+ - add_ride: Adds a ride to the schedule (DM's only)
+ - delete_ride: Remove a scheduled ride (DM's only)
+ - modify_ride: Modify an existing ride (DM's only) (mega buggy currently)
