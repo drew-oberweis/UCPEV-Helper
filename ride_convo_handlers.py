@@ -180,7 +180,7 @@ ride_add_conv_handler = ConversationHandler(
             Ride_Helper_Functions.TIME: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_time_ask_meetup)],
             Ride_Helper_Functions.MEETUP: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_meetup_ask_destination)],
             Ride_Helper_Functions.DESTINATION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_destination_ask_pace)],
-            Ride_Helper_Functions.PACE: [MessageHandler(filters.Regex(ride_pace_regex), Ride_Helper_Functions.store_pace_ask_description)],
+            Ride_Helper_Functions.PACE: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_pace_ask_description)],
             Ride_Helper_Functions.DESCRIPTION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_description)]
         },
         fallbacks=[CommandHandler("cancel", Ride_Helper_Functions.cancel)]

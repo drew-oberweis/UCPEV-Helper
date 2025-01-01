@@ -51,6 +51,19 @@ class Session:
             return string
         return string.replace("'", "''")
     
+    def __deserialize(self, ride):
+        this_ride = Ride()
+        this_ride.set_id(ride[0])
+        this_ride.set_type(ride[2])
+        this_ride.set_date(int(float(ride[3])))
+        this_ride.set_time(ride[4])
+        this_ride.set_meetup(ride[5])
+        this_ride.set_destination(ride[6])
+        this_ride.set_pace(ride[8])
+        this_ride.set_description(ride[7])
+        return this_ride
+
+    
     def sanitize(func):
         def wrapper(self, *args, **kwargs):
             args = [self.__sanitize(i) for i in args]
@@ -87,6 +100,20 @@ class Session:
             self.cursor.execute("SELECT * FROM messages")
         return self.cursor.fetchall()
     
+    def get_ride(self, ride_id): # returns the ride object, or the next ride if ride_id is None
+        # make sure to get the next ride *after* the current time
+        if ride_id:
+            self.cursor.execute(f"SELECT * FROM rides WHERE ride_id = '{ride_id}' AND ride_date > '{datetime.now().timestamp()} ORDER BY ride_date ASC LIMIT 1'")
+        else:
+            self.cursor.execute(f"SELECT * FROM rides WHERE ride_date > '{datetime.now().timestamp()}' ORDER BY ride_date ASC LIMIT 1")
+        ride = self.cursor.fetchone()
+
+        if not ride:
+            return None
+
+        this_ride = self.__deserialize(ride)
+        return this_ride
+    
     def get_rides(self, creator_id=None, ride_time_after=None, limit=None):
         if creator_id:
             logger.log(logging.DEBUG, f"Getting rides for {creator_id}")
@@ -105,15 +132,7 @@ class Session:
 
         for ride in result:
 
-            this_ride = Ride()
-            this_ride.set_id(ride[0])
-            this_ride.set_type(ride[2])
-            this_ride.set_date(int(float(ride[3])))
-            this_ride.set_time(ride[4])
-            this_ride.set_meetup(ride[5])
-            this_ride.set_destination(ride[6])
-            this_ride.set_pace(ride[8])
-            this_ride.set_description(ride[7])
+            this_ride = self.__deserialize(ride)
             rides.append(this_ride)
             this_ride = None
 
@@ -121,47 +140,6 @@ class Session:
             rides = rides[:limit]
 
         return rides
-    
-    def get_ride_by_id(self, ride_id):
-        self.cursor.execute(f"SELECT * FROM rides WHERE ride_id = '{ride_id}'")
-        result = self.cursor.fetchone()
-        ride = Ride()
-        ride.set_id(result[0])
-        ride.set_type(result[2])
-        ride.set_date(int(float(result[3])))
-        ride.set_time(result[4])
-        ride.set_meetup(result[5])
-        ride.set_destination(result[6])
-        ride.set_pace(result[8])
-        ride.set_description(result[7])
-        return ride
-
-    def get_ride_by_str(self, ride_str): # really broken and currenlty unused. leaving it here for now
-        ride = Ride()
-
-        ride_str_list = ride_str.split(" ")
-
-        date_timestamp = int(datetime.strptime(ride_str_list[3], "%m/%d/%Y").timestamp())
-
-        ride.set_type(ride_str_list[0])
-        ride.set_date(date_timestamp)
-        ride.set_time(ride_str_list[5])
-        ride.set_meetup(ride_str_list[7])
-
-        logger.log(logging.DEBUG, ride_str_list)
-
-        if(ride_str_list[0] == "Short" or ride_str_list[0] == "Long"):
-            ride.set_destination(ride_str_list[9])
-
-        # confirm that ride exists in database, and pull it's id and description
-        rides = self.get_rides()
-        for r in rides:
-            if r.str_one_line() == ride.str_one_line():
-                ride.set_id(r.id)
-                ride.set_description(r.description)
-                return ride
-            
-        return None
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:

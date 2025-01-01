@@ -67,6 +67,7 @@ commands_map = {
 admin_commands_map = {
     "test_admin": admin_commands.test_admin,
     "announce": admin_commands.announce,
+    "make_ride_poll": admin_commands.make_ride_poll
 }
 
 def main():
