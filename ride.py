@@ -76,7 +76,9 @@ class Ride:
         self.description = description
     def set_id(self, ride_id):
         self.id = ride_id
-    def set_pace(self, pace):  
+    def set_pace(self, pace): 
+        if (pace not in self.ride_pace_options):
+            raise ValueError("Invalid pace")
         self.pace = pace
 
     ride_type_options = ["Short", "Long", "I2S", "Other"]
