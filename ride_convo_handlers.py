@@ -6,7 +6,7 @@ import db
 import os
 import datetime
 
-from ride import Ride
+from ride import Ride, Verifiers
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +49,14 @@ for i in Ride.ride_type_options:
     ride_type_regex += i + "|"
 ride_type_regex = ride_type_regex[:-1] + ")$"
 
+ride_type_keyboard = ReplyKeyboardMarkup([[i for i in Ride.ride_type_options]], one_time_keyboard=True, input_field_placeholder="Select a type")
+
 ride_pace_regex = "^("
 for i in Ride.ride_pace_options:
     ride_pace_regex += i + "|"
 ride_pace_regex = ride_pace_regex[:-1] + ")$"
+
+ride_pace_keyboard = ReplyKeyboardMarkup([[i for i in Ride.ride_pace_options]], one_time_keyboard=True, input_field_placeholder="Select a pace")
 
 regex_all = "^(?!/cancel).*$" # match anything except /cancel
 regex_date = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$"
@@ -83,29 +87,34 @@ class Ride_Helper_Functions:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
             return ConversationHandler.END
 
-        ride_type_keyboard = [[i for i in Ride.ride_type_options]]
-        ride_pace_keyboard = [[i for i in Ride.ride_pace_options]]
-
         logger.log(logging.DEBUG, f"User {update.effective_user.id} started ride creation process")
 
         await update.message.reply_text("Beginning ride creation process. Follow all prompts to add a ride, or type /cancel to exit.\n\nSelect ride type", 
-                                        reply_markup=ReplyKeyboardMarkup(ride_type_keyboard, 
-                                                                        one_time_keyboard=True, 
-                                                                        input_field_placeholder="Select a ride type"))
+                                        reply_markup=ride_type_keyboard)
 
         return Ride_Helper_Functions.TYPE
 
     async def store_type_ask_date(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
-        this_ride.set_type(update.message.text)
+        try:
+            this_ride.set_type(update.message.text)
+        except ValueError:
+            await update.message.reply_text("Invalid ride type. Please select a valid ride type from the list.",
+                                             reply_markup=ride_type_keyboard)
+            return Ride_Helper_Functions.TYPE
         logger.log(logging.DEBUG, f"Ride type set to {this_ride.type} by {update.effective_user.id}")
         await update.message.reply_text(f"Ride type set to {this_ride.type}. Enter the date of the ride (MUST BE IN MM/DD/YYYY FORMAT, including zeroes for single digits)")
         return Ride_Helper_Functions.DATE
 
     async def store_date_ask_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
-        unix_date = int(datetime.datetime.strptime(update.message.text, "%m/%d/%Y").timestamp())
-        this_ride.set_date(unix_date)
+        
+        if(not(Verifiers.verify_date(update.message.text))):
+            await update.message.reply_text("Invalid date. Please enter a valid date in MM/DD/YYYY format.")
+            return Ride_Helper_Functions.DATE
+        
+        this_ride.set_date(update.message.text)
+
         logger.log(logging.DEBUG, f"Ride date set to {this_ride.date} by {update.effective_user.id}")
         await update.message.reply_text(f"Ride date set to {this_ride.nice_date()}. Enter the time of the ride" )
         return Ride_Helper_Functions.TIME
@@ -133,14 +142,17 @@ class Ride_Helper_Functions:
         this_ride.set_destination(update.message.text)
         logger.log(logging.DEBUG, f"Ride destination set to {this_ride.destination} by {update.effective_user.id}")
         await update.message.reply_text(f"Destination set to {this_ride.destination}. Enter the pace of the ride",
-                                        reply_markup=ReplyKeyboardMarkup([[i for i in Ride.ride_pace_options]], 
-                                                                         one_time_keyboard=True, 
-                                                                         input_field_placeholder="Select a pace"))
+                                        reply_markup=ride_pace_keyboard)
         return Ride_Helper_Functions.PACE
 
     async def store_pace_ask_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
         global this_ride
-        this_ride.set_pace(update.message.text)
+        try:
+            this_ride.set_pace(update.message.text)
+        except ValueError:
+            await update.message.reply_text("Invalid pace. Please select a valid pace from the list.",
+                                             reply_markup=ride_pace_keyboard)
+            return Ride_Helper_Functions.PACE
         logger.log(logging.DEBUG, f"Ride pace set to {this_ride.pace} by {update.effective_user.id}")
         await update.message.reply_text(f"Pace set to {this_ride.pace}. Enter a description of the ride")
         return Ride_Helper_Functions.DESCRIPTION
@@ -156,7 +168,6 @@ class Ride_Helper_Functions:
         global db_creds
 
         session = db.Session(db_creds)
-
 
         session.add_ride(update.effective_user.id, this_ride.type, this_ride.date, this_ride.time, this_ride.meetup_location, this_ride.destination, this_ride.pace, this_ride.description)
 
@@ -175,8 +186,8 @@ ride_add_conv_handler = ConversationHandler(
         name="add_ride_handler",
         entry_points=[CommandHandler("add_ride", Ride_Helper_Functions.add_ride)],
         states= {
-            Ride_Helper_Functions.TYPE: [MessageHandler(filters.Regex(ride_type_regex), Ride_Helper_Functions.store_type_ask_date)],
-            Ride_Helper_Functions.DATE: [MessageHandler(filters.Regex(regex_date), Ride_Helper_Functions.store_date_ask_time)],
+            Ride_Helper_Functions.TYPE: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_type_ask_date)],
+            Ride_Helper_Functions.DATE: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_date_ask_time)],
             Ride_Helper_Functions.TIME: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_time_ask_meetup)],
             Ride_Helper_Functions.MEETUP: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_meetup_ask_destination)],
             Ride_Helper_Functions.DESTINATION: [MessageHandler(filters.Regex(regex_all), Ride_Helper_Functions.store_destination_ask_pace)],
@@ -326,23 +337,25 @@ class Ride_Modify_Functions:
 
         session = db.Session(db_creds)
 
-        # These should REALLY be checking to see if the the new value is valid, but I will add that later.
-
-        if this_mod.get_field() == "Type":
-            session.update_ride(this_mod.get_ride().id, "type", this_mod.get_new_value())
-        elif this_mod.get_field() == "Date":
-            unix_date = datetime.datetime.strptime(this_mod.get_new_value(), "%m/%d/%Y").timestamp()
-            session.update_ride(this_mod.get_ride().id, "ride_date", unix_date)
-        elif this_mod.get_field() == "Time":
-            session.update_ride(this_mod.get_ride().id, "time", this_mod.get_new_value())
-        elif this_mod.get_field() == "Meetup location":
-            session.update_ride(this_mod.get_ride().id, "meetup_location", this_mod.get_new_value())
-        elif this_mod.get_field() == "Destination":
-            session.update_ride(this_mod.get_ride().id, "destination", this_mod.get_new_value())
-        elif this_mod.get_field() == "Pace":
-            session.update_ride(this_mod.get_ride().id, "pace", this_mod.get_new_value())
-        elif this_mod.get_field() == "Description":
-            session.update_ride(this_mod.get_ride().id, "description", this_mod.get_new_value())
+        try:
+            if this_mod.get_field() == "Type":
+                session.update_ride(this_mod.get_ride().id, "type", this_mod.get_new_value())
+            elif this_mod.get_field() == "Date":
+                unix_date = datetime.datetime.strptime(this_mod.get_new_value(), "%m/%d/%Y").timestamp()
+                session.update_ride(this_mod.get_ride().id, "ride_date", unix_date)
+            elif this_mod.get_field() == "Time":
+                session.update_ride(this_mod.get_ride().id, "time", this_mod.get_new_value())
+            elif this_mod.get_field() == "Meetup location":
+                session.update_ride(this_mod.get_ride().id, "meetup_location", this_mod.get_new_value())
+            elif this_mod.get_field() == "Destination":
+                session.update_ride(this_mod.get_ride().id, "destination", this_mod.get_new_value())
+            elif this_mod.get_field() == "Pace":
+                session.update_ride(this_mod.get_ride().id, "pace", this_mod.get_new_value())
+            elif this_mod.get_field() == "Description":
+                session.update_ride(this_mod.get_ride().id, "description", this_mod.get_new_value())
+        except ValueError:
+            await update.message.reply_text("Invalid value. Please enter a valid value.")
+            return Ride_Modify_Functions.MODIFY
 
         logger.log(logging.DEBUG, f"User {update.effective_user.id} modified {this_mod.get_field()} to {this_mod.get_new_value()}")
 

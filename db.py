@@ -193,7 +193,23 @@ class Session:
         self.cursor.execute(f"DELETE FROM rides WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
+    @sanitize
     def update_ride(self, ride_id, field, value):
+        # verify that the field exists
+        if field not in tables["rides"]:
+            raise ValueError("Invalid field")
+        
+        # perform field-specific verification
+        if field == "ride_date":
+            if(not(Ride.verify_date(value))):
+                raise ValueError("Invalid date")
+        if field == "pace":
+            if(not(Ride.verify_pace(value))):
+                raise ValueError("Invalid pace")
+        if field == "ride_type":
+            if(not(Ride.verify_type(value))):
+                raise ValueError("Invalid ride type")
+            
         self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
