@@ -2,6 +2,7 @@ import logging
 import time
 import os
 import sys
+import asyncio
 
 from telegram import (
     Update
@@ -70,7 +71,7 @@ admin_commands_map = {
     "make_ride_poll": admin_commands.make_ride_poll
 }
 
-def main():
+async def main():
     app = Application.builder().token(token).build()
 
     for i in commands_map:
@@ -88,6 +89,20 @@ def main():
     with open("commands.txt", "w") as f:
         f.write(command_list)
 
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+    
+    # Now the bot is running, and we can run new code here
 
-main()
+    while True: # This should remain the last thing in the main loop, the stopping code below should never be reached
+        await asyncio.sleep(1)
+        logger.log(logging.DEBUG, "Hit end of main loop, something went wrong. Getting stuck here to prevent bot shutdown.")
+
+    await app.updater.stop()
+    await app.stop()
+    await app.shutdown()
+
+asyncio.run(main())
+
+logger.log(logging.CRITICAL, "How did we get here?")
