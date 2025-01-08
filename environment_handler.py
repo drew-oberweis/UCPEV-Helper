@@ -8,7 +8,11 @@ logger = logging.getLogger(__name__)
 
 def get_env_vars():
     load_dotenv()
-    token = os.environ['telegram_token']
+    try:
+        token = os.environ['telegram_token']
+    except KeyError:
+        logger.error("Telegram token not found in environment variables.")
+        token = None
     try:
         db_creds = db.DB_Credentials(
             host=os.environ["postgres_host"],
