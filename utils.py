@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
 import os
+import zipfile
+import shutil
 
 from telegram import (
     Update,
@@ -24,6 +26,10 @@ from telegram.constants import (
 import db
 from discord_webhook import DiscordWebhook
 import data
+import YoursTruly
+import environment_handler
+
+token, db_creds = environment_handler.get_env_vars()
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +112,41 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, messa
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
     return
 
-async def download_file(context, file_id, file_name):
+async def download_ride(context, file_id, file_name, user_id):
+
+    # make sure directory exists
+    if not os.path.exists("downloads"):
+        os.makedirs("downloads")
+
     file = await context.bot.get_file(file_id)
-    file.download_to_drive("ride.zip")
+    logger.log(logging.DEBUG, f"Downloading ride {file_id} to {file_name}")
+    await file.download_to_drive("./downloads/ride.zip")
+    logger.log(logging.DEBUG, f"Downloaded ride {file_id} to {file_name}")
+
+    # extract the zip file
+    with zipfile.ZipFile("./downloads/ride.zip", 'r') as zip_ref:
+        zip_ref.extractall(f"./downloads/{file_name}")
+    
+    logger.log(logging.DEBUG, f"Extracted ride {file_id} to {file_name}")
+
+    # delete the zip file
+    os.remove("./downloads/ride.zip")
+    logger.log(logging.DEBUG, f"Deleted ride zip folder")
+
+    ride = YoursTruly.Ride(f"./downloads/{file_name}/YT_ride.json")
+
+    # verify that rides folder exists
+    if not os.path.exists("rides"):
+        os.makedirs("rides")
+
+    # move json to rides folder, and rename it to the ride ID
+    shutil.move(f"./downloads/{file_name}/YT_ride.json", f"./rides/{ride.getId()}.json")
+
+    # clean up downloads folder
+    os.rmdir(f"./downloads/{file_name}")
+
+    session = db.Session(db_creds)
+
+    session.write_ride_upload(ride.getId(), user_id)
+
+    return ride

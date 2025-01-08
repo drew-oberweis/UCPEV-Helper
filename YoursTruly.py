@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import os
+import json
+import db
 
 class Ride:
     __vehicle = None
@@ -40,6 +42,14 @@ class Ride:
     __escEfficiency = None
     __escTotalDistance = None
     __gpsTotalDistance = None
+
+    def __init__(self, path):
+        raw = None
+        with open(path, 'r') as f:
+            raw = json.load(f)
+
+        self.parseRide(raw)
+        self.mergePoints()
 
     def setVehicle(self, vehicle):
         self.__vehicle = vehicle
@@ -132,7 +142,6 @@ class Ride:
                 ridePoint.acceleration = 0
 
             self.__path.append(ridePoint)
-
     
     def parseRide(self, rideData): # rideData is a dictionary
         self.setVehicle(rideData.get('vehicle').get('name'))

@@ -31,6 +31,12 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     # ignore if private chat
     if(update.effective_chat.type == "private"):
+        logger.log(logging.INFO, f"Recieved message from private chat. Contents: {str(update)}")
+        # get the document if it exists
+        if(update.effective_message.document):
+            logger.log(logging.INFO, f"Document recieved from private chat. Contents: {str(update.effective_message.document)}")
+            document = update.effective_message.document
+            await utils.download_ride(context, document.file_id, update.effective_chat.id)
         return do_nothing()
     
     is_admin = await is_telegram_admin(update, context)

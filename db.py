@@ -8,7 +8,8 @@ tables = {
     "messages": ["msg_id", "user_id", "chat_id", "timestamp", "content"],
     "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description", "pace"],
     "logs": ["level", "source", "message", "timestamp"], # not used
-    "command_history": ["msg_id", "command", "timestamp"]
+    "command_history": ["msg_id", "command", "timestamp"],
+    "ride_uploads": ["ride_id", "user_id", "timestamp"],
 }
 
 from ride import Ride
@@ -140,6 +141,10 @@ class Session:
             rides = rides[:limit]
 
         return rides
+    
+    def write_ride_upload(self, ride_id, user_id):
+        self.cursor.execute(f"INSERT INTO ride_uploads (ride_id, user_id, timestamp) VALUES ('{ride_id}', '{user_id}', '{datetime.now()}')")
+        self.conn.commit()
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:

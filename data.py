@@ -1,5 +1,5 @@
 commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads", "rides"]
-admin_commands = ["test_admin", "announce", "add_ride", "modify_ride", "make_ride_poll", "upload_ride"]
+admin_commands = ["test_admin", "announce", "add_ride", "modify_ride", "make_ride_poll"]
 
 command_descriptions = {
     "nosedive": "Sends a link to a nosedive video",

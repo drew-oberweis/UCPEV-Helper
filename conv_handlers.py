@@ -58,7 +58,7 @@ ride_pace_regex = ride_pace_regex[:-1] + ")$"
 
 ride_pace_keyboard = ReplyKeyboardMarkup([[i for i in Ride.ride_pace_options]], one_time_keyboard=True, input_field_placeholder="Select a pace")
 
-regex_all = "^(?!/cancel).*$" # match anything except /cancel
+regex_all = ".*" # match everything
 regex_date = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$"
 
 global this_ride
@@ -390,3 +390,51 @@ modify_ride_conv_handler = ConversationHandler(
         },
         fallbacks=[CommandHandler("cancel", Ride_Modify_Functions.cancel)]
 )
+
+class Ride_Upload_Functions:
+    async def upload_ride(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        logger.log(logging.DEBUG, "Upload ride command called")
+
+        # check if the user is in a group chat
+        if update.effective_chat.type == "group" or update.effective_chat.type == "supergroup":
+            await update.message.reply_text("This command can only be used in a private chat.")
+            logger.log(logging.INFO, f"User {update.effective_user.id} attempted to use command upload_ride in a group chat")
+            return ConversationHandler.END
+
+        # make sure the user is an admin
+        is_admin = await utils.is_admin(update.effective_user)
+        if not is_admin:
+            logger.info(f"Unauthorized access to command upload_ride by user {update.effective_user.id}")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
+            return ConversationHandler.END
+
+        await update.message.reply_text("Upload a ride file")
+        return 1
+    
+    async def upload_ride_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if update.message.text == "/cancel":
+            await update.message.reply_text("Ride upload cancelled.")
+            return ConversationHandler.END
+
+        if not update.message.document:
+            await update.message.reply_text("Invalid file. Please upload a file.")
+            return ConversationHandler.END
+
+        await update.message.reply_text(f"Downloading file {update.message.document.file_name}")
+        await utils.download_ride(context, update.message.document.file_id, update.message.document.file_name, update.effective_user.id)
+        await update.message.reply_text(f"File {update.message.document.file_name} downloaded.")
+
+        return ConversationHandler.END
+    
+    async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("Ride upload cancelled.")
+        return ConversationHandler.END
+    
+upload_ride_conv_handler = ConversationHandler(
+        name="upload_ride_handler",
+        entry_points=[CommandHandler("upload_ride", Ride_Upload_Functions.upload_ride)],
+        states = {
+            1: [MessageHandler(filters.ALL, Ride_Upload_Functions.upload_ride_file)]
+        },
+        fallbacks=[CommandHandler("cancel", Ride_Upload_Functions.cancel)]
+    )
