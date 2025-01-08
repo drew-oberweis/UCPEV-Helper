@@ -12,6 +12,10 @@ ADD environment_handler.py /app
 ADD custom_handlers.py /app
 ADD ride_convo_handlers.py /app
 ADD ride.py /app
+ADD flask_listener.py /app
+
+# Open port 5000 for the Flask app
+EXPOSE 5000
 
 WORKDIR /app
 RUN mkdir /app/logs
