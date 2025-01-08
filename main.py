@@ -30,13 +30,16 @@ log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special
 
 # set higher logging level for httpx to avoid all GET and POST requests being logged
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
-logging.getLogger("telegram.ext.ExtBot").setLevel(logging.WARNING)
-logging.getLogger("telegram.ext.Application").setLevel(logging.WARNING)
-logging.getLogger("httpcore.connection").setLevel(logging.WARNING)
-logging.getLogger("telegram.ext.Updater").setLevel(logging.WARNING)
-logging.getLogger("telegram.ext.ConversationHandler").setLevel(logging.WARNING)
+
+extraLogLevel = logging.WARNING
+
+logging.getLogger("httpx").setLevel(extraLogLevel)
+logging.getLogger("httpcore.http11").setLevel(extraLogLevel)
+logging.getLogger("telegram.ext.ExtBot").setLevel(extraLogLevel)
+logging.getLogger("telegram.ext.Application").setLevel(extraLogLevel)
+logging.getLogger("httpcore.connection").setLevel(extraLogLevel)
+logging.getLogger("telegram.ext.Updater").setLevel(extraLogLevel)
+logging.getLogger("telegram.ext.ConversationHandler").setLevel(extraLogLevel)
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +70,8 @@ commands_map = {
 admin_commands_map = {
     "test_admin": admin_commands.test_admin,
     "announce": admin_commands.announce,
-    "make_ride_poll": admin_commands.make_ride_poll
+    "make_ride_poll": admin_commands.make_ride_poll,
+    "upload_ride": admin_commands.upload_ride
 }
 
 def main():

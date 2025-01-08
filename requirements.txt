@@ -3,7 +3,7 @@ python-dotenv
 psycopg2
 discord-webhook
 
-kaleido==0.1.0.post1 # SPECIFICALLY THIS VERSION, OTHERS HANG
+kaleido
 numpy
 pandas
 plotly
