@@ -3,6 +3,7 @@ python-telegram-bot[job-queue]
 python-dotenv
 psycopg2
 discord-webhook
+flask
 
 kaleido
 numpy

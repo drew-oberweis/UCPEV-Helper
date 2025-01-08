@@ -4,6 +4,9 @@ import os
 import sys
 import asyncio
 
+# for flask
+from flask import Flask, jsonify, request
+
 from telegram import (
     Update
 )
@@ -25,6 +28,8 @@ import environment_handler
 import custom_handlers as c_handlers
 import utils
 from utils import UpdateBundle
+import ride_convo_handlers
+import flask_listener
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -107,9 +112,12 @@ def main():
     
     # Now the bot is running, and we can run new code here
 
+    flask_listener.start(app.bot, utils.send_message_to_chat)
+
     while True: # This should remain the last thing in the main loop, the stopping code below should never be reached
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         logger.log(logging.DEBUG, "Hit end of main loop, something went wrong. Getting stuck here to prevent bot shutdown.")
+        # await utils.send_message_to_chat(app.bot, "-1002409253277", "A message")
 
     await app.updater.stop()
     await app.stop()
