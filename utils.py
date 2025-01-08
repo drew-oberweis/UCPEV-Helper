@@ -101,7 +101,13 @@ def output_telegram_autocomplete():
     return output
 
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
-    logger.debug(f"Sending message: {message}")
+    logger.debug(f"Sending message to channel {update.effective_chat.id}: {message}")
     # reply to the message that called this command
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+    return
+
+async def send_message_to_chat(bot, chat_id: str, message: str):
+    logger.debug(f"Sending message: {message}")
+    # reply to the message that called this command
+    await bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
     return
