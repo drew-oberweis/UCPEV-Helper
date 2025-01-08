@@ -105,3 +105,7 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, messa
     # reply to the message that called this command
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
     return
+
+async def download_file(context, file_id, file_name):
+    file = await context.bot.get_file(file_id)
+    file.download_to_drive("ride.zip")
