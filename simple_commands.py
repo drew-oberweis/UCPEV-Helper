@@ -17,6 +17,7 @@ import data
 import db
 import ride
 from utils import send_message
+import YoursTruly
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -146,3 +147,43 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rides_msg = rides_msg[:-len(divider)-1]
 
     await send_message(update, context, f"Upcoming rides:\n\n{rides_msg}")
+
+async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # sends the a message containing info on their uploaded rides
+    logger.debug("Uploads command called")
+
+    db_creds = db.DB_Credentials(
+        host=os.getenv("postgres_host", None),
+        user=os.getenv("postgres_user", None),
+        password=os.getenv("postgres_pass", None),
+        database=os.getenv("postgres_db", None)
+    )
+
+    session = db.Session(db_creds)
+
+    user_id = update.effective_user.id
+    user_uploads = session.get_ride_uploads(user_id=user_id)
+
+    if not user_uploads:
+        await send_message(update, context, "You have not uploaded any rides.")
+        return
+    
+    divider = "----------------"
+
+    uploads_msg = ""
+    for ride in user_uploads:
+        id = ride[0]
+
+        ride = YoursTruly.Ride(f"./rides/{id}.json")
+
+        ride_name = ride.getName()
+        ride_author = ride.getRider()
+
+        uploads_msg += f"{ride_name}\n{ride_author}\n{divider}\n"
+
+    # cut off bottom line
+    uploads_msg = uploads_msg[:-len(divider)-1]
+
+    await send_message(update, context, f"Your uploaded rides:\n\n{uploads_msg}")
+
+    return

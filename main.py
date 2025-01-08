@@ -64,7 +64,8 @@ commands_map = {
     "help": simple_commands.help,
     "pads": simple_commands.pads,
     "i2s": simple_commands.i2s,
-    "rides": simple_commands.rides
+    "rides": simple_commands.rides,
+    "uploads": simple_commands.uploads,
 }
 
 admin_commands_map = {

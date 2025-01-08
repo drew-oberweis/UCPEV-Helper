@@ -1,4 +1,4 @@
-commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads", "rides"]
+commands = ["nosedive", "rules", "links", "codes", "helmet", "help", "pads", "rides", "uploads"]
 admin_commands = ["test_admin", "announce", "add_ride", "modify_ride", "make_ride_poll"]
 
 command_descriptions = {
@@ -11,7 +11,8 @@ command_descriptions = {
     "pads": "Sends a list of recommended pads",
     "i2s": "Sends a message about Intro 2 Speed",
     "rides": "Sends a list of upcoming rides",
-    "inline": "Sends information about collab rides with Inline Insomniacs"
+    "inline": "Sends information about collab rides with Inline Insomniacs",
+    "uploads": "See your uploaded rides"
 }
 
 admin_command_descriptions = {

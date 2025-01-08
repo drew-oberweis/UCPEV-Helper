@@ -145,6 +145,15 @@ class Session:
     def write_ride_upload(self, ride_id, user_id):
         self.cursor.execute(f"INSERT INTO ride_uploads (ride_id, user_id, timestamp) VALUES ('{ride_id}', '{user_id}', '{datetime.now()}')")
         self.conn.commit()
+
+    def get_ride_uploads(self, ride_id=None, user_id=None):
+        if ride_id:
+            self.cursor.execute(f"SELECT * FROM ride_uploads WHERE ride_id = '{ride_id}'")
+        elif user_id:
+            self.cursor.execute(f"SELECT * FROM ride_uploads WHERE user_id = '{user_id}'")
+        else:
+            self.cursor.execute("SELECT * FROM ride_uploads")
+        return self.cursor.fetchall()
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:
