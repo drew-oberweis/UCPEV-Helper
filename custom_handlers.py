@@ -14,7 +14,7 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
-import simple_commands
+import user_commands
 import admin_commands
 import data
 import db

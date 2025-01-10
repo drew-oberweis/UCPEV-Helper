@@ -4,7 +4,7 @@ RUN mkdir /app
 ADD admin_commands.py /app
 ADD main.py /app
 ADD requirements.txt /app
-ADD simple_commands.py /app
+ADD user_commands.py /app
 ADD utils.py /app
 ADD data.py /app
 ADD db.py /app
