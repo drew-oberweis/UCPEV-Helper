@@ -146,6 +146,10 @@ class Session:
         self.cursor.execute(f"INSERT INTO ride_uploads (ride_id, user_id, timestamp) VALUES ('{ride_id}', '{user_id}', '{datetime.now()}')")
         self.conn.commit()
 
+    def rm_ride_upload(self, ride_id):
+        self.cursor.execute(f"DELETE FROM ride_uploads WHERE ride_id = '{ride_id}'")
+        self.conn.commit()
+
     def get_ride_uploads(self, ride_id=None, user_id=None):
         if ride_id:
             self.cursor.execute(f"SELECT * FROM ride_uploads WHERE ride_id = '{ride_id}'")

@@ -178,8 +178,9 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         ride_name = ride.getName()
         ride_author = ride.getRider()
+        ride_id = ride.getId()
 
-        uploads_msg += f"{ride_name}\n{ride_author}\n{divider}\n"
+        uploads_msg += f"Name: {ride_name}\n{ride_author}\nRide ID: {ride_id}\n{divider}\n"
 
     # cut off bottom line
     uploads_msg = uploads_msg[:-len(divider)-1]
@@ -187,3 +188,25 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_message(update, context, f"Your uploaded rides:\n\n{uploads_msg}")
 
     return
+
+async def delete_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # delete a ride from the database and it's associated file
+
+    db_creds = db.DB_Credentials(
+        host=os.getenv("postgres_host", None),
+        user=os.getenv("postgres_user", None),
+        password=os.getenv("postgres_pass", None),
+        database=os.getenv("postgres_db", None)
+    )
+
+    session = db.Session(db_creds)
+
+    # pull ride id from message
+    id = update.message.text.split(" ")[1]
+
+    try:
+        session.rm_ride_upload(id)
+        os.remove(f"./rides/{id}.json")
+    except Exception as e:
+        await send_message(update, context, f"Ride not found.\n\nError {e}")
+        return

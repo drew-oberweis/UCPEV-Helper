@@ -66,6 +66,7 @@ commands_map = {
     "i2s": user_commands.i2s,
     "rides": user_commands.rides,
     "uploads": user_commands.uploads,
+    "delete_upload": user_commands.delete_upload,
 }
 
 admin_commands_map = {
