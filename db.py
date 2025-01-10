@@ -178,7 +178,7 @@ class Session:
 
     def get_user(self, user_id):
         self.cursor.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
-        user = self.cursor.fetchone()
+        user = self.cursor.fetchone()[0]
         return user
     
     def update_user(self, user_id, username, is_admin=False): # update username by ID
@@ -230,6 +230,10 @@ class Session:
             
         self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
+
+    def get_upload_author(self, ride_id):
+        self.cursor.execute(f"SELECT user_id FROM ride_uploads WHERE ride_id = '{ride_id}'")
+        return self.cursor.fetchone()[0]
 
     @sanitize
     def add_warning(self, user_id, reason):
