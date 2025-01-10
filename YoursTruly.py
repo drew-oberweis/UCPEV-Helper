@@ -43,12 +43,15 @@ class Ride:
     __escTotalDistance = None
     __gpsTotalDistance = None
 
-    def __init__(self, path):
+    def __init__(self, path, rider=None):
         raw = None
         with open(path, 'r') as f:
             raw = json.load(f)
 
-        self.parseRide(raw)
+        if(rider == None):
+            self.parseRide(raw)
+        else:
+            self.parseRide(raw, rider)
         self.mergePoints()
 
     def setVehicle(self, vehicle):
@@ -143,9 +146,9 @@ class Ride:
 
             self.__path.append(ridePoint)
     
-    def parseRide(self, rideData): # rideData is a dictionary
+    def parseRide(self, rideData, rider="Not Defined"): # rideData is a dictionary
         self.setVehicle(rideData.get('vehicle').get('name'))
-        self.setRider("John Doe") # TODO: have rider name be provided
+        self.setRider(rider) # rider name is not stored in the export, so optionally accept it as an argument
         self.setName(rideData.get('rideTitle'))
         self.setId(rideData.get('id'))
         self.__startTime = rideData.get('startedAt')
