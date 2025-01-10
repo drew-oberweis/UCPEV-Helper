@@ -162,8 +162,10 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # sends the a message containing info on their uploaded rides
-    logger.debug("Uploads command called")
+
     ub = UpdateBundle(update, context)
+
+    logger.debug("Uploads command called")
 
     db_creds = db.DB_Credentials(
         host=os.getenv("postgres_host", None),
@@ -174,7 +176,7 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     session = db.Session(db_creds)
 
-    user_id = update.effective_user.id
+    user_id = ub.get_update().effective_user.id
     user_uploads = session.get_ride_uploads(user_id=user_id)
 
     if not user_uploads:
@@ -190,10 +192,16 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ride = YoursTruly.Ride(f"./rides/{id}.json")
 
         ride_name = ride.getName()
-        ride_author = ride.getRider()
         ride_id = ride.getId()
 
-        uploads_msg += f"Name: {ride_name}\n{ride_author}\nRide ID: {ride_id}\n{divider}\n"
+        # pull ride author id from database
+        ride_author_id = session.get_upload_author(id)
+        ride_author = session.get_user(ride_author_id)
+        ride_author_message = f"Uploaded by <a href='tg://user?id={ride_author}'>{ride_author}</a>"
+
+        logger.log(logging.DEBUG, f"Ride name: {ride_name}\nRide author: {ride_author}Ride Author ID: {ride_author_id}\nRide ID: {ride_id}")
+
+        uploads_msg += f"Name: {ride_name}\n{ride_author_message}\nRide ID: {ride_id}\n{divider}\n"
 
     # cut off bottom line
     uploads_msg = uploads_msg[:-len(divider)-1]
