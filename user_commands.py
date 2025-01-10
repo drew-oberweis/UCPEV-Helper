@@ -16,7 +16,7 @@ from telegram.constants import ParseMode
 import data
 import db
 import ride
-from utils import send_message
+from utils import UpdateBundle
 import YoursTruly
 
 responses = data.responses
@@ -34,59 +34,70 @@ Eventually all of these responses should pull dynamically from the database to a
 """
 
 async def links(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Links command called")
-    await send_message(update, context, responses["links"])
+    await ub.send_message(responses["links"])
 
 async def nosedive(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Nosedive command called")
-    await send_message(update, context, responses["nosedive"])
+    await ub.send_message(responses["nosedive"])
     return
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Rules command called")
 
     rules_msg = responses["rules_header"] + "\n\n"
     for i in responses["rules"]:
         rules_msg += f"- {i}\n"
-    await send_message(update, context, rules_msg)
+    await ub.send_message(rules_msg)
 
     return
 
 async def helmet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Helmet command called")
-    await send_message(update, context, responses["helmet"])
+    await ub.send_message(responses["helmet"])
     return
 
 async def pads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Pads command called")
-    await send_message(update, context, responses["pads"])
+    await ub.send_message(responses["pads"])
     return
 
 async def codes(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Codes command called")
-    await send_message(update, context, responses["codes"])
+    await ub.send_message(responses["codes"])
     return
 
 async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    ub = UpdateBundle(update, context)
 
     was_member, is_member = utils.extract_status_change(update.chat_member)
 
     if not was_member and is_member:
         logger.debug("Welcome command called")
-        await send_message(update, context, responses["welcome"])
+        await ub.send_message(responses["welcome"])
     return
 
 async def i2s(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("I2S command called")
-    await send_message(update, context, responses["i2s"])
+    await ub.send_message(responses["i2s"])
     return
 
 async def inline(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Inline command called")
-    await send_message(update, context, responses["inline"])
+    await ub.send_message(responses["inline"])
     return
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
     logger.debug("Help command called")
     help_msg = "Here are the commands you can use:\n"
     for i in commands: # TODO: Make this filter by what the user can actually do
@@ -99,11 +110,12 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i in admin_commands:
             help_msg += f"/{i} - {admin_command_descriptions[i]}\n"
 
-    await send_message(update, context, help_msg)
+    await ub.send_message(help_msg)
     return
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Rides command called")
+    ub = UpdateBundle(update, context)
     
     db_creds = db.DB_Credentials(
         host=os.getenv("postgres_host", None),
@@ -121,7 +133,7 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # if rides is empty, return a message saying so
     if not rides:
-        await send_message(update, context, "There are no upcoming rides.")
+        await ub.send_message("There are no upcoming rides.")
         return
 
     divider = "----------------"
@@ -146,11 +158,12 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # cut off bottom line
     rides_msg = rides_msg[:-len(divider)-1]
 
-    await send_message(update, context, f"Upcoming rides:\n\n{rides_msg}")
+    await ub.send_message(f"Upcoming rides:\n\n{rides_msg}")
 
 async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # sends the a message containing info on their uploaded rides
     logger.debug("Uploads command called")
+    ub = UpdateBundle(update, context)
 
     db_creds = db.DB_Credentials(
         host=os.getenv("postgres_host", None),
@@ -165,7 +178,7 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_uploads = session.get_ride_uploads(user_id=user_id)
 
     if not user_uploads:
-        await send_message(update, context, "You have not uploaded any rides.")
+        await ub.send_message("You have not uploaded any rides.")
         return
     
     divider = "----------------"
@@ -185,12 +198,13 @@ async def uploads(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # cut off bottom line
     uploads_msg = uploads_msg[:-len(divider)-1]
 
-    await send_message(update, context, f"Your uploaded rides:\n\n{uploads_msg}")
+    await ub.send_message(f"Your uploaded rides:\n\n{uploads_msg}")
 
     return
 
 async def delete_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # delete a ride from the database and it's associated file
+    ub = UpdateBundle(update, context)
 
     db_creds = db.DB_Credentials(
         host=os.getenv("postgres_host", None),
@@ -208,5 +222,7 @@ async def delete_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
         session.rm_ride_upload(id)
         os.remove(f"./rides/{id}.json")
     except Exception as e:
-        await send_message(update, context, f"Ride not found.\n\nError {e}")
+        await ub.send_message(f"Ride not found.\n\nError {e}")
         return
+    
+    await ub.send_message(f"Ride {id} deleted.")

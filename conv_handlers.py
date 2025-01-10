@@ -419,10 +419,12 @@ class Ride_Upload_Functions:
         if not update.message.document:
             await update.message.reply_text("Invalid file. Please upload a file.")
             return ConversationHandler.END
+        
+        updateBundle = utils.UpdateBundle(update, context)
 
         try:
             await update.message.reply_text(f"Downloading file {update.message.document.file_name}")
-            await utils.download_ride(context, update.message.document.file_id, update.message.document.file_name, update.effective_user.id)
+            await utils.download_ride(updateBundle, update.message.document.file_id, update.message.document.file_name)
             await update.message.reply_text(f"File {update.message.document.file_name} downloaded.")
         except Exception as e:
             await update.effective_chat.send_message(f"Error downloading file: {e}\n\nPlease run the command again or contact the bot maintainer.")

@@ -60,6 +60,39 @@ async def is_admin(user: User):
     logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
     return status
 
+class UpdateBundle:
+    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        self.update = update
+        self.context = context
+
+    def get_update(self) -> Update:
+        return self.update
+    
+    def get_context(self) -> ContextTypes.DEFAULT_TYPE:
+        return self.context
+    
+    def get_chat(self) -> Chat:
+        return self.update.effective_chat
+    
+    def get_user(self) -> User:
+        return self.update.effective_user
+    
+    def get_message(self) -> Optional[str]:
+        return self.update.effective_message
+    
+    def get_text(self) -> Optional[str]:
+        return self.update.effective_message.text
+    
+    async def send_message(self, message: str):
+        # logger.debug(f"Sending message: {message}")
+        # reply to the message that called this command
+        context = self.get_context()
+        update = self.get_update()
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+        return
+    
+    async def send_reply(self, message: str):
+        return await self.update.effective_message.reply_text(message)
 
 # This is a direct rip from https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py
 def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
@@ -106,19 +139,16 @@ def output_telegram_autocomplete():
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
 
-async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
-    # logger.debug(f"Sending message: {message}")
-    # reply to the message that called this command
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
-    return
-
-async def download_ride(context, file_id, file_name, user_id):
+async def download_ride(updateBundle: UpdateBundle, file_id, file_name):
 
     # make sure directory exists
     if not os.path.exists("downloads"):
         os.makedirs("downloads")
 
-    file = await context.bot.get_file(file_id)
+    user = updateBundle.get_user()
+    logger.log(logging.DEBUG, f"User {user.username} ({user.id}) is uploading ride {file_id}")
+
+    file = await updateBundle.get_context().bot.get_file(file_id)
     logger.log(logging.DEBUG, f"Downloading ride {file_id} to {file_name}")
     await file.download_to_drive("./downloads/ride.zip")
     logger.log(logging.DEBUG, f"Downloaded ride {file_id} to {file_name}")
@@ -133,7 +163,7 @@ async def download_ride(context, file_id, file_name, user_id):
     os.remove("./downloads/ride.zip")
     logger.log(logging.DEBUG, f"Deleted ride zip folder")
 
-    ride = YoursTruly.Ride(f"./downloads/{file_name}/YT_ride.json")
+    ride = YoursTruly.Ride(f"./downloads/{file_name}/YT_ride.json", user.username)
 
     # verify that rides folder exists
     if not os.path.exists("rides"):
@@ -147,6 +177,6 @@ async def download_ride(context, file_id, file_name, user_id):
 
     session = db.Session(db_creds)
 
-    session.write_ride_upload(ride.getId(), user_id)
+    session.write_ride_upload(ride.getId(), user.id)
 
     return ride
