@@ -9,7 +9,7 @@ tables = {
     "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description", "pace"],
     "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"],
-    "ride_uploads": ["ride_id", "user_id", "timestamp"],
+    "trips": ["trip_id", "user_id", "timestamp", "source"], # for tracking uploaded/tracked rides. "source" is where it comes from (telegram tracked, Yours Truly, etc.)
 }
 
 from ride import Ride
@@ -142,22 +142,26 @@ class Session:
 
         return rides
     
-    def write_ride_upload(self, ride_id, user_id):
-        self.cursor.execute(f"INSERT INTO ride_uploads (ride_id, user_id, timestamp) VALUES ('{ride_id}', '{user_id}', '{datetime.now()}')")
+    def save_trip(self, trip_id, user_id, source):
+        self.cursor.execute(f"INSERT INTO trips (trip_id, user_id, timestamp, source) VALUES ('{trip_id}', '{user_id}', '{datetime.now()}', '{source}')")
         self.conn.commit()
 
-    def rm_ride_upload(self, ride_id):
-        self.cursor.execute(f"DELETE FROM ride_uploads WHERE ride_id = '{ride_id}'")
+    def remove_trip(self, trip_id):
+        self.cursor.execute(f"DELETE FROM trips WHERE trip_id = '{trip_id}'")
         self.conn.commit()
 
-    def get_ride_uploads(self, ride_id=None, user_id=None):
-        if ride_id:
-            self.cursor.execute(f"SELECT * FROM ride_uploads WHERE ride_id = '{ride_id}'")
+    def get_trips(self, trip_id=None, user_id=None):
+        if trip_id:
+            self.cursor.execute(f"SELECT * FROM trips WHERE trip_id = '{trip_id}'")
         elif user_id:
-            self.cursor.execute(f"SELECT * FROM ride_uploads WHERE user_id = '{user_id}'")
+            self.cursor.execute(f"SELECT * FROM trips WHERE user_id = '{user_id}'")
         else:
-            self.cursor.execute("SELECT * FROM ride_uploads")
+            self.cursor.execute("SELECT * FROM trips")
         return self.cursor.fetchall()
+    
+    def get_trip_author(self, trip_id):
+        self.cursor.execute(f"SELECT user_id FROM trips WHERE trip_id = '{trip_id}'")
+        return self.cursor.fetchone()[0]
     
     def get_warnings(self, warn_id=None, user_id=None):
         if warn_id:
@@ -178,7 +182,7 @@ class Session:
 
     def get_user(self, user_id):
         self.cursor.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
-        user = self.cursor.fetchone()[0]
+        user = self.cursor.fetchone()
         return user
     
     def update_user(self, user_id, username, is_admin=False): # update username by ID
@@ -231,10 +235,6 @@ class Session:
         self.cursor.execute(f"UPDATE rides SET {field} = '{value}' WHERE ride_id = '{ride_id}'")
         self.conn.commit()
 
-    def get_upload_author(self, ride_id):
-        self.cursor.execute(f"SELECT user_id FROM ride_uploads WHERE ride_id = '{ride_id}'")
-        return self.cursor.fetchone()[0]
-
     @sanitize
     def add_warning(self, user_id, reason):
         user_id = self.__sanitize(user_id)
@@ -247,19 +247,3 @@ class Session:
         warn_id = self.__sanitize(warn_id)
         self.cursor.execute(f"DELETE FROM warnings WHERE warn_id = '{warn_id}'")
         self.conn.commit()
-
-if(__name__ == "__main__"):
-
-    # for debugging, or to manually force table verification/creation
-
-    import dotenv # we don't normally want to import this, but it is needed to test DB connections
-    import os
-    dotenv.load_dotenv()
-
-    host = os.getenv("postgres_host")
-    user = os.getenv("postgres_user")
-    password = os.getenv("postgres_pass")
-    database = os.getenv("postgres_db")
-
-    session = Session(host, user, password, database)
-    print("Tables verified")

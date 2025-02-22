@@ -52,6 +52,8 @@ async def is_admin(user: User):
 
     status = db_user[2]
 
+    logger.log(logging.INFO, f"User {user.id} is an admin: {db_user}")
+
     if status == "True":
         status = True
     else:
@@ -139,7 +141,7 @@ def output_telegram_autocomplete():
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
 
-async def download_ride(updateBundle: UpdateBundle, file_id, file_name):
+async def download_YT_trip(updateBundle: UpdateBundle, file_id, file_name) -> YoursTruly.Trip:
 
     # make sure directory exists
     if not os.path.exists("downloads"):
@@ -157,26 +159,26 @@ async def download_ride(updateBundle: UpdateBundle, file_id, file_name):
     with zipfile.ZipFile("./downloads/ride.zip", 'r') as zip_ref:
         zip_ref.extractall(f"./downloads/{file_name}")
     
-    logger.log(logging.DEBUG, f"Extracted ride {file_id} to {file_name}")
+    logger.log(logging.DEBUG, f"Extracted trip {file_id} to {file_name}")
 
     # delete the zip file
     os.remove("./downloads/ride.zip")
     logger.log(logging.DEBUG, f"Deleted ride zip folder")
 
-    ride = YoursTruly.Ride(f"./downloads/{file_name}/YT_ride.json", user.username)
+    trip = YoursTruly.Trip(f"./downloads/{file_name}/YT_ride.json", user.username)
 
     # verify that rides folder exists
-    if not os.path.exists("rides"):
-        os.makedirs("rides")
+    if not os.path.exists("trips"):
+        os.makedirs("trips")
 
     # move json to rides folder, and rename it to the ride ID
-    shutil.move(f"./downloads/{file_name}/YT_ride.json", f"./rides/{ride.getId()}.json")
+    shutil.move(f"./downloads/{file_name}/YT_ride.json", f"./trips/{trip.getId()}.json")
 
     # clean up downloads folder
     os.rmdir(f"./downloads/{file_name}")
 
     session = db.Session(db_creds)
 
-    session.write_ride_upload(ride.getId(), user.id)
+    session.save_trip(trip.getId(), user.id, "Yours Truly")
 
-    return ride
+    return trip

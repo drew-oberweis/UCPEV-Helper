@@ -65,8 +65,10 @@ commands_map = {
     "pads": user_commands.pads,
     "i2s": user_commands.i2s,
     "rides": user_commands.rides,
-    "uploads": user_commands.uploads,
-    "delete_upload": user_commands.delete_upload,
+    "trip": user_commands.trip,
+    "trips": user_commands.trip, # alias
+    "delete_trip": user_commands.delete_trip,
+    "trip_stats": user_commands.trip_stats,
 }
 
 admin_commands_map = {
@@ -86,7 +88,7 @@ def main():
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(conv_handlers.ride_add_conv_handler)
     app.add_handler(conv_handlers.modify_ride_conv_handler)
-    app.add_handler(conv_handlers.upload_ride_conv_handler)
+    app.add_handler(conv_handlers.trip_upload_conv_handler)
     app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
     command_list = utils.output_telegram_autocomplete()

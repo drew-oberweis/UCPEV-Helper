@@ -5,7 +5,7 @@ import os
 import json
 import db
 
-class Ride:
+class Trip:
     __vehicle = None
     __rider = None
     __name = None
@@ -77,6 +77,39 @@ class Ride:
     
     def getId(self):
         return self.__id
+    
+    def getEscTopSpeed(self):
+        return self.__escTopSpeed
+    
+    def getGpsTopSpeed(self):
+        return self.__gpsTopSpeed
+    
+    def getEscAverageSpeed(self):
+        return self.__escAverageSpeed
+    
+    def getGpsAverageSpeed(self):
+        return self.__gpsAverageSpeed
+    
+    def getEscTotalDistance(self): 
+        return self.__escTotalDistance
+    
+    def getGpsTotalDistance(self):
+        return self.__gpsTotalDistance
+    
+    def getElevationGain(self):
+        return self.__elevationGain
+    
+    def getElevationLoss(self):
+        return self.__elevationLoss
+    
+    def getStartTime(self):
+        return self.__startTime
+    
+    def getEndTime(self):
+        return self.__endTime
+    
+    def getDuration(self):
+        return self.__duration
 
     def mergePoints(self):
         """

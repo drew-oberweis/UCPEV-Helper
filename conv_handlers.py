@@ -7,6 +7,7 @@ import os
 import datetime
 
 from ride import Ride, Verifiers
+from utils import UpdateBundle
 
 logger = logging.getLogger(__name__)
 
@@ -391,57 +392,64 @@ modify_ride_conv_handler = ConversationHandler(
         fallbacks=[CommandHandler("cancel", Ride_Modify_Functions.cancel)]
 )
 
-class Ride_Upload_Functions:
-    async def upload_ride(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        logger.log(logging.DEBUG, "Upload ride command called")
+class Trip_Upload_Functions:
+    async def upload_trip(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        logger.log(logging.DEBUG, "Upload trip command called")
+
+        ub = UpdateBundle(update, context)
 
         # check if the user is in a group chat
         if update.effective_chat.type == "group" or update.effective_chat.type == "supergroup":
-            await update.message.reply_text("This command can only be used in a private chat.")
-            logger.log(logging.INFO, f"User {update.effective_user.id} attempted to use command upload_ride in a group chat")
+            await ub.send_message("This command can only be used in a private chat.")
+            logger.log(logging.INFO, f"User {update.effective_user.id} attempted to use command upload_trip in a group chat")
             return ConversationHandler.END
 
         # make sure the user is an admin
         is_admin = await utils.is_admin(update.effective_user)
         if not is_admin:
-            logger.info(f"Unauthorized access to command upload_ride by user {update.effective_user.id}")
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
+            logger.info(f"Unauthorized access to command upload_trip by user {update.effective_user.id}")
+            await ub.send_message("You are not authorized to use this command.")
             return ConversationHandler.END
 
-        await update.message.reply_text("Upload a ride file")
+        await ub.send_message("Upload a trip file. Type /cancel to cancel.")
         return 1
     
-    async def upload_ride_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def download_trip_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+        ub = UpdateBundle(update, context)
+
         if update.message.text == "/cancel":
-            await update.message.reply_text("Ride upload cancelled.")
+            await ub.send_message("Trip upload cancelled.")
             return ConversationHandler.END
 
         if not update.message.document:
-            await update.message.reply_text("Invalid file. Please upload a file.")
+            await ub.send_message("Invalid file. Please upload a file.")
             return ConversationHandler.END
         
         updateBundle = utils.UpdateBundle(update, context)
 
         try:
-            await update.message.reply_text(f"Downloading file {update.message.document.file_name}")
-            await utils.download_ride(updateBundle, update.message.document.file_id, update.message.document.file_name)
-            await update.message.reply_text(f"File {update.message.document.file_name} downloaded.")
+            await ub.send_message(f"Downloading file {update.message.document.file_name}")
+            trip = await utils.download_YT_trip(updateBundle, update.message.document.file_id, update.message.document.file_name)
+            await ub.send_message(f"Trip {trip.getName()} downloaded and imported.")
         except Exception as e:
-            await update.effective_chat.send_message(f"Error downloading file: {e}\n\nPlease run the command again or contact the bot maintainer.")
+            await ub.send_message(f"Error downloading file: {e}\n\nPlease run the command again or contact the bot maintainer.")
             logger.log(logging.ERROR, f"Error downloading file: {e}")
             return ConversationHandler.END
 
         return ConversationHandler.END
     
     async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text("Ride upload cancelled.")
+        ub = UpdateBundle(update, context)
+        await ub.send_message("Trip upload cancelled.")
         return ConversationHandler.END
     
-upload_ride_conv_handler = ConversationHandler(
-        name="upload_ride_handler",
-        entry_points=[CommandHandler("upload_ride", Ride_Upload_Functions.upload_ride)],
+trip_upload_conv_handler = ConversationHandler(
+
+        name="upload_trip_handler",
+        entry_points=[CommandHandler("upload_trip", Trip_Upload_Functions.upload_trip)],
         states = {
-            1: [MessageHandler(filters.ALL, Ride_Upload_Functions.upload_ride_file)]
+            1: [MessageHandler(filters.ALL, Trip_Upload_Functions.download_trip_file)]
         },
-        fallbacks=[CommandHandler("cancel", Ride_Upload_Functions.cancel)]
+        fallbacks=[CommandHandler("cancel", Trip_Upload_Functions.cancel)]
     )
