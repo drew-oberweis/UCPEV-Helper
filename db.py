@@ -9,7 +9,6 @@ tables = {
     "rides": ["ride_id", "creator_id", "ride_type", "ride_date", "ride_time", "meetup_location", "destination", "description", "pace"],
     "logs": ["level", "source", "message", "timestamp"], # not used
     "command_history": ["msg_id", "command", "timestamp"],
-    "trips": ["trip_id", "user_id", "timestamp", "source"], # for tracking uploaded/tracked rides. "source" is where it comes from (telegram tracked, Yours Truly, etc.)
 }
 
 from ride import Ride

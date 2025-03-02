@@ -26,7 +26,6 @@ from telegram.constants import (
 import db
 from discord_webhook import DiscordWebhook
 import data
-import YoursTruly
 import environment_handler
 
 token, db_creds = environment_handler.get_env_vars()
@@ -140,45 +139,3 @@ def output_telegram_autocomplete():
 
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
-
-async def download_YT_trip(updateBundle: UpdateBundle, file_id, file_name) -> YoursTruly.Trip:
-
-    # make sure directory exists
-    if not os.path.exists("downloads"):
-        os.makedirs("downloads")
-
-    user = updateBundle.get_user()
-    logger.log(logging.DEBUG, f"User {user.username} ({user.id}) is uploading ride {file_id}")
-
-    file = await updateBundle.get_context().bot.get_file(file_id)
-    logger.log(logging.DEBUG, f"Downloading ride {file_id} to {file_name}")
-    await file.download_to_drive("./downloads/ride.zip")
-    logger.log(logging.DEBUG, f"Downloaded ride {file_id} to {file_name}")
-
-    # extract the zip file
-    with zipfile.ZipFile("./downloads/ride.zip", 'r') as zip_ref:
-        zip_ref.extractall(f"./downloads/{file_name}")
-    
-    logger.log(logging.DEBUG, f"Extracted trip {file_id} to {file_name}")
-
-    # delete the zip file
-    os.remove("./downloads/ride.zip")
-    logger.log(logging.DEBUG, f"Deleted ride zip folder")
-
-    trip = YoursTruly.Trip(f"./downloads/{file_name}/YT_ride.json", user.username)
-
-    # verify that rides folder exists
-    if not os.path.exists("trips"):
-        os.makedirs("trips")
-
-    # move json to rides folder, and rename it to the ride ID
-    shutil.move(f"./downloads/{file_name}/YT_ride.json", f"./trips/{trip.getId()}.json")
-
-    # clean up downloads folder
-    os.rmdir(f"./downloads/{file_name}")
-
-    session = db.Session(db_creds)
-
-    session.save_trip(trip.getId(), user.id, "Yours Truly")
-
-    return trip

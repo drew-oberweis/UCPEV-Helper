@@ -12,7 +12,6 @@ ADD environment_handler.py /app
 ADD custom_handlers.py /app
 ADD conv_handlers.py /app
 ADD ride.py /app
-ADD YoursTruly.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs
