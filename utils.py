@@ -89,8 +89,8 @@ class UpdateBundle:
         # reply to the message that called this command
         context = self.get_context()
         update = self.get_update()
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
-        return
+        message = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+        return message
     
     async def send_reply(self, message: str):
         return await self.update.effective_message.reply_text(message)
