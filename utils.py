@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
 import os
+import zipfile
+import shutil
 
 from telegram import (
     Update,
@@ -24,6 +26,9 @@ from telegram.constants import (
 import db
 from discord_webhook import DiscordWebhook
 import data
+import environment_handler
+
+token, db_creds = environment_handler.get_env_vars()
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +51,8 @@ async def is_admin(user: User):
 
     status = db_user[2]
 
+    logger.log(logging.INFO, f"User {user.id} is an admin: {db_user}")
+
     if status == "True":
         status = True
     else:
@@ -54,6 +61,39 @@ async def is_admin(user: User):
     logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
     return status
 
+class UpdateBundle:
+    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        self.update = update
+        self.context = context
+
+    def get_update(self) -> Update:
+        return self.update
+    
+    def get_context(self) -> ContextTypes.DEFAULT_TYPE:
+        return self.context
+    
+    def get_chat(self) -> Chat:
+        return self.update.effective_chat
+    
+    def get_user(self) -> User:
+        return self.update.effective_user
+    
+    def get_message(self) -> Optional[str]:
+        return self.update.effective_message
+    
+    def get_text(self) -> Optional[str]:
+        return self.update.effective_message.text
+    
+    async def send_message(self, message: str):
+        # logger.debug(f"Sending message: {message}")
+        # reply to the message that called this command
+        context = self.get_context()
+        update = self.get_update()
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+        return
+    
+    async def send_reply(self, message: str):
+        return await self.update.effective_message.reply_text(message)
 
 # This is a direct rip from https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py
 def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
@@ -99,9 +139,3 @@ def output_telegram_autocomplete():
 
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
-
-async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message: str):
-    logger.debug(f"Sending message: {message}")
-    # reply to the message that called this command
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
-    return

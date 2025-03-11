@@ -7,6 +7,7 @@ import os
 import datetime
 
 from ride import Ride, Verifiers
+from utils import UpdateBundle
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ ride_pace_regex = ride_pace_regex[:-1] + ")$"
 
 ride_pace_keyboard = ReplyKeyboardMarkup([[i for i in Ride.ride_pace_options]], one_time_keyboard=True, input_field_placeholder="Select a pace")
 
-regex_all = "^(?!/cancel).*$" # match anything except /cancel
+regex_all = ".*" # match everything
 regex_date = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$"
 
 global this_ride
@@ -377,16 +378,3 @@ class Ride_Modify_Functions:
             await update.message.reply_text("Ride deletion cancelled.")
 
         return ConversationHandler.END
-
-modify_ride_conv_handler = ConversationHandler(
-        name="modify_ride_handler",
-        entry_points=[CommandHandler("modify_ride", Ride_Modify_Functions.select_ride)],
-        states = {
-            Ride_Modify_Functions.ACTION: [MessageHandler(filters.Regex(regex_all), Ride_Modify_Functions.select_action)],
-            Ride_Modify_Functions.READACTION: [MessageHandler(filters.Regex(regex_all), Ride_Modify_Functions.read_action)],
-            Ride_Modify_Functions.MODIFY: [MessageHandler(filters.Regex(regex_all), Ride_Modify_Functions.modify_ride)],
-            Ride_Modify_Functions.MODOPTIONS: [MessageHandler(filters.Regex(regex_all), Ride_Modify_Functions.mod_options)],
-            Ride_Modify_Functions.DELETE: [MessageHandler(filters.Regex(regex_all), Ride_Modify_Functions.delete_ride)]
-        },
-        fallbacks=[CommandHandler("cancel", Ride_Modify_Functions.cancel)]
-)
