@@ -19,16 +19,18 @@ import data
 import utils
 import environment_handler
 import db
+from utils import UpdateBundle
 
 logger = logging.getLogger(__name__)
 token, db_creds = environment_handler.get_env_vars()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        ub = UpdateBundle(update, context)
         is_admin = await utils.is_admin(update.effective_user)
         if not is_admin:
             logger.info(f"Unauthorized access to command {func.__name__} by user {update.effective_user.id}")
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not authorized to use this command.")
+            await ub.send_message("You are not authorized to use this command.")
             return
         return await func(update, context)
     return wrapper
@@ -37,17 +39,19 @@ def confirm_admin(func):
 @confirm_admin
 async def test_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.debug("Test admin command called")
-    await context.bot.send_message(update.effective_chat.id, "You are an admin.")
+    ub = UpdateBundle(update, context)
+    await ub.send_message("You are an admin.")
     return
 
 @confirm_admin
 async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
+    ub = UpdateBundle(update, context)
     if len(context.args) == 0:
         await context.bot.send_message(update.effective_chat.id, "Please provide a message to announce.")
         return
     message = " ".join(context.args)
-    message = await context.bot.send_message(update.effective_chat.id, message)
+    message = await ub.send_message(message)
 
     await message.pin()
 
@@ -59,6 +63,8 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @confirm_admin
 async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    ub = UpdateBundle(update, context)
+
     try:
         selected_id = context.args[0]
     except IndexError:
@@ -68,7 +74,7 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ride = session.get_ride(selected_id)
 
     if not ride:
-        await context.bot.send_message(update.effective_chat.id, "Ride not found.")
+        await ub.send_message("Ride not found.")
         return
     
     """
@@ -94,7 +100,7 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Send ride info message
     message = f"Ride info:\n{ride}"
-    await context.bot.send_message(update.effective_chat.id, message)
+    await ub.send_message(message)
 
     # generate poll options
     poll_options = ["Be there", "Be square", "Maybe"]
