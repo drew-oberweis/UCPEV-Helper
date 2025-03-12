@@ -113,48 +113,5 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.debug("Rides command called")
     ub = UpdateBundle(update, context)
-    
-    db_creds = db.DB_Credentials(
-        host=os.getenv("postgres_host", None),
-        user=os.getenv("postgres_user", None),
-        password=os.getenv("postgres_pass", None),
-        database=os.getenv("postgres_db", None)
-    )
-
-    session = db.Session(db_creds)
-    curtime = datetime.datetime.now().timestamp()
-    yesterday = curtime - 86400
-    
-
-    rides = session.get_rides(ride_time_after=yesterday)
-
-    # if rides is empty, return a message saying so
-    if not rides:
-        await ub.send_message("There are no upcoming rides.")
-        return
-
-    divider = "----------------"
-
-    # sort rides
-    rides.sort()
-
-    # include ride ID in message if user is an admin
-    include_id = utils.is_admin(update.effective_user)
-    # but don't if the user is the bot
-    if update.effective_user.id == context.bot.id:
-        include_id = False
-
-    rides_msg = ""
-    if (include_id):
-        for ride in rides:
-            rides_msg += f"{ride}\n{ride.id}\n{divider}\n"
-    else:
-        for ride in rides:
-            rides_msg += f"{ride}\n{divider}\n"
-
-    # cut off bottom line
-    rides_msg = rides_msg[:-len(divider)-1]
-
-    await ub.send_message(f"Upcoming rides:\n\n{rides_msg}")
+    await ub.send_message(f"Not yet implemented")

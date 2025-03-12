@@ -10,7 +10,6 @@ ADD data.py /app
 ADD db.py /app
 ADD environment_handler.py /app
 ADD custom_handlers.py /app
-ADD conv_handlers.py /app
 ADD ride.py /app
 
 WORKDIR /app
