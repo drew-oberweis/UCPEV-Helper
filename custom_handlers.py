@@ -45,7 +45,10 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     content = message.text
 
     if(username == None):
-        username = user.first_name + " " + user.last_name
+        try:
+            username = user.first_name + " " + user.last_name
+        except:
+            username = user.first_name
 
     session.add_message(message.message_id, user_id, chat_id, content)
 
