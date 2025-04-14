@@ -115,4 +115,46 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
-    await ub.send_message(shit.get_rides())
+
+    ride_inf = shit.get_rides()[0]
+
+    organizer = ride_inf[0]
+    name = ride_inf[1]
+    date = ride_inf[2]
+    time = ride_inf[3]
+    route = ride_inf[4]
+    pace = ride_inf[5]
+    extra = ride_inf[6]
+
+    route_inf = shit.get_route(route)
+
+    start_loc = route_inf[1]
+    start_pin = route_inf[2]
+    notable_loc = route_inf[3]
+    end_loc = route_inf[4]
+    end_pin = route_inf[5]
+    dist = route_inf[6]
+    gaia_link = route_inf[7]
+    route_desc = route_inf[8]
+    route_extra = route_inf[9]
+
+    if extra != "":
+        extra = f"\n\n{extra}"
+
+    ride_message = f"{name}\nOrganizer: {organizer}\n\nDate/Time: {date} @ {time}\nPace: {pace}{extra}"
+    
+    if start_pin == "":
+        start_msg = f"Start Location: {start_loc}"
+    else:
+        start_msg = f"Start Location: {start_loc} ({start_pin})"
+
+    if end_pin == "":
+        end_msg = f"End Location: {end_loc}"
+    else:
+        end_msg = f"End Location: {end_loc} ({end_pin})"
+
+    route_message = f"Route Name: {route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
+
+    message = ride_message + "\n\n" + route_message
+
+    await ub.send_message(message)
