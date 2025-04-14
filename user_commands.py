@@ -17,6 +17,7 @@ import data
 import db
 import ride
 from utils import UpdateBundle
+import sheets_interface as shit
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -114,4 +115,4 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
-    await ub.send_message(f"Not yet implemented")
+    await ub.send_message(shit.get_rides())
