@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
 import os
+import zipfile
+import shutil
 
 from telegram import (
     Update,
@@ -17,9 +19,16 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
+from telegram.constants import (
+    ParseMode,
+)
+
 import db
 from discord_webhook import DiscordWebhook
 import data
+import environment_handler
+
+token, db_creds = environment_handler.get_env_vars()
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +51,8 @@ async def is_admin(user: User):
 
     status = db_user[2]
 
+    logger.log(logging.INFO, f"User {user.id} is an admin: {db_user}")
+
     if status == "True":
         status = True
     else:
@@ -50,6 +61,43 @@ async def is_admin(user: User):
     logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
     return status
 
+class UpdateBundle:
+    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        self.update = update
+        self.context = context
+
+    def get_update(self) -> Update:
+        return self.update
+    
+    def get_context(self) -> ContextTypes.DEFAULT_TYPE:
+        return self.context
+    
+    def get_chat(self) -> Chat:
+        return self.update.effective_chat
+    
+    def get_user(self) -> User:
+        return self.update.effective_user
+    
+    def get_message(self) -> Optional[str]:
+        return self.update.effective_message
+    
+    def get_text(self) -> Optional[str]:
+        return self.update.effective_message.text
+    
+    async def send_message(self, message: str):
+        # logger.debug(f"Sending message: {message}")
+        # reply to the message that called this command
+        try:
+            context = self.get_context()
+            update = self.get_update()
+            message = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+            return message
+        except Exception as e:
+            message = await context.bot.send_message(chat_id=update.effective_chat.id, text="Error: " + str(e), parse_mode=ParseMode.HTML)
+            return message
+    
+    async def send_reply(self, message: str):
+        return await self.update.effective_message.reply_text(message)
 
 # This is a direct rip from https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py
 def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
