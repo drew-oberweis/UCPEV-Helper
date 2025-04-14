@@ -44,6 +44,7 @@ def get_log_level():
         return logging.INFO # info should be default
     
 def generate_google_creds():
+    logger.info("Pulling Google credentials...")
     # Load environment variables and store them into the correct files
     load_dotenv()
 
@@ -58,5 +59,7 @@ def generate_google_creds():
         f.write(creds)
     with open("google_token.json", "w") as f:
         f.write(token)
+
+    logger.info("Google credentials pulled.")
 
     return "google_creds.json", "google_token.json"
