@@ -17,6 +17,7 @@ import data
 import db
 import ride
 from utils import UpdateBundle
+import sheets_interface as shit
 
 responses = data.responses
 command_descriptions = data.command_descriptions
@@ -113,48 +114,47 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.debug("Rides command called")
     ub = UpdateBundle(update, context)
+
+    ride_inf = shit.get_rides()[0]
+
+    organizer = ride_inf[0]
+    name = ride_inf[1]
+    date = ride_inf[2]
+    time = ride_inf[3]
+    route = ride_inf[4]
+    pace = ride_inf[5]
+    extra = ride_inf[6]
+
+    route_inf = shit.get_route(route)
+
+    start_loc = route_inf[1]
+    start_pin = route_inf[2]
+    notable_loc = route_inf[3]
+    end_loc = route_inf[4]
+    end_pin = route_inf[5]
+    dist = route_inf[6]
+    gaia_link = route_inf[7]
+    route_desc = route_inf[8]
+    route_extra = route_inf[9]
+
+    if extra != "":
+        extra = f"\n\n{extra}"
+
+    ride_message = f"{name}\nOrganizer: {organizer}\n\nDate/Time: {date} @ {time}\nPace: {pace}{extra}"
     
-    db_creds = db.DB_Credentials(
-        host=os.getenv("postgres_host", None),
-        user=os.getenv("postgres_user", None),
-        password=os.getenv("postgres_pass", None),
-        database=os.getenv("postgres_db", None)
-    )
-
-    session = db.Session(db_creds)
-    curtime = datetime.datetime.now().timestamp()
-    yesterday = curtime - 86400
-    
-
-    rides = session.get_rides(ride_time_after=yesterday)
-
-    # if rides is empty, return a message saying so
-    if not rides:
-        await ub.send_message("There are no upcoming rides.")
-        return
-
-    divider = "----------------"
-
-    # sort rides
-    rides.sort()
-
-    # include ride ID in message if user is an admin
-    include_id = utils.is_admin(update.effective_user)
-    # but don't if the user is the bot
-    if update.effective_user.id == context.bot.id:
-        include_id = False
-
-    rides_msg = ""
-    if (include_id):
-        for ride in rides:
-            rides_msg += f"{ride}\n{ride.id}\n{divider}\n"
+    if start_pin == "":
+        start_msg = f"Start Location: {start_loc}"
     else:
-        for ride in rides:
-            rides_msg += f"{ride}\n{divider}\n"
+        start_msg = f"Start Location: {start_loc} ({start_pin})"
 
-    # cut off bottom line
-    rides_msg = rides_msg[:-len(divider)-1]
+    if end_pin == "":
+        end_msg = f"End Location: {end_loc}"
+    else:
+        end_msg = f"End Location: {end_loc} ({end_pin})"
 
-    await ub.send_message(f"Upcoming rides:\n\n{rides_msg}")
+    route_message = f"Route Name: {route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
+
+    message = ride_message + "\n\n" + route_message
+
+    await ub.send_message(message)

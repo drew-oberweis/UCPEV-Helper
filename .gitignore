@@ -162,3 +162,6 @@ cython_debug/
 #.idea/
 
 .vscode
+google_credentials.json
+
+google_token.json
