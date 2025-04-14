@@ -44,7 +44,7 @@ def get_rides():
         
         sheet = __get_sheet()
 
-        data_range = "RideQuery!B2:G"
+        data_range = "RideQuery!A2:G"
     
         result = (
             sheet.values()
