@@ -53,11 +53,11 @@ def get_rides():
         )
         values = result.get("values", [])
 
-        # if the last column is empty on the sheet, the row won't be added at all. It should instead be added as empty
+        # pad the array to ALWAYS have 7 elements
 
-        for i in range(len(values)):
-            if len(values[i]) < 7:
-                values[i].append("")
+        for row in values:
+            while len(row) < 7:
+                row.append("")
 
         return values
 
@@ -81,16 +81,26 @@ def get_route(name):
 
     # name is the first column in the range
 
+    route = None
+
     for row in values:
         if row[0] == name:
-            row.append("")
-            return row[0:]
-    return None
+            route = row[0:]
+
+    # pad the array to ALWAYS have 10 elements
+
+
+    while len(route) < 10:
+        route.append("")
+
+    return route
 
 
 
 if __name__ == "__main__":
     result = get_rides()[0]
     print(result)
+    print(f"Length: {len(result)}")
     result_2 = get_route(result[4])
     print(result_2)
+    print(f"Length: {len(result_2)}")
