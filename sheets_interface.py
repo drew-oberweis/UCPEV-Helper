@@ -1,10 +1,13 @@
 import os.path
+import logging
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+logger = logging.getLogger(__name__)
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -21,7 +24,15 @@ def __get_sheet():
     # created automatically when the authorization flow completes for the first
     # time.
     if os.path.exists("google_token.json"):
-        creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
+        try:
+            creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
+        except Exception as e:
+            print(f"Error loading token.json: {e}")
+            print(f"Found token file: {os.path.exists('google_token.json')}")
+            print(f"Token file contents: {open('google_token.json').read()}")
+            print(f"Found creds file: {os.path.exists('google_creds.json')}")
+            print(f"Creds file contents: {open('google_creds.json').read()}")
+            creds = None
     # If there are no (valid) credentials available, attempt to refresh
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -95,7 +106,25 @@ def get_route(name):
 
     return route
 
-
+def refresh_token():
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    logger.log(logging.INFO, "Refreshing token...")
+    if os.path.exists("google_token.json"):
+        try:
+            creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
+        except Exception as e:
+            logger.log(logging.ERROR, f"Error loading token.json: {e}")
+            creds = None
+    # If there are no (valid) credentials available, attempt to refresh
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            logger.log(logging.INFO, "Token refreshed")
+        else:
+            raise Exception("Outdated Credentials")
 
 if __name__ == "__main__":
     result = get_rides()[0]
