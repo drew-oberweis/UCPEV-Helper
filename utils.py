@@ -90,10 +90,11 @@ class UpdateBundle:
         try:
             context = self.get_context()
             update = self.get_update()
-            message = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML)
+            logger.log(logging.DEBUG, f"Chat ID: {update.effective_chat.id}")
+            message = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
             return message
         except Exception as e:
-            message = await context.bot.send_message(chat_id=update.effective_chat.id, text="Error: " + str(e), parse_mode=ParseMode.HTML)
+            message = await context.bot.send_message(chat_id=update.effective_chat.id, text="Error: " + str(e), parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
             return message
     
     async def send_reply(self, message: str):
