@@ -11,7 +11,7 @@ command_descriptions = {
     "pads": "Sends a list of recommended pads",
     "i2s": "Sends a message about Intro 2 Speed",
     "rides": "Sends a list of upcoming rides",
-    "inline": "Sends information about collab rides with Inline Insomniacs"
+    "inline": "Sends information about collab rides with Inline Insomniacs",
     "econtact": "Sends a link to the emergency contact form"
 }
 
