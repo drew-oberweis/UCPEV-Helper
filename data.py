@@ -12,6 +12,7 @@ command_descriptions = {
     "i2s": "Sends a message about Intro 2 Speed",
     "rides": "Sends a list of upcoming rides",
     "inline": "Sends information about collab rides with Inline Insomniacs"
+    "econtact": "Sends a link to the emergency contact form"
 }
 
 admin_command_descriptions = {
