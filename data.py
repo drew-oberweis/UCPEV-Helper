@@ -20,6 +20,8 @@ admin_command_descriptions = {
     "make_ride_poll": "Makes a poll for the next ride (or a selected ride)"
 }
 
+emergency_contact_form_url = "https://forms.gle/ZooQHi9JM5Jj2Jba7"
+
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
     "welcome": "Welcome to UIUC PEV! Do /rules to check the rules of the group, and /help to see other commands!",
     "rules_header": "The rules of this group are generally pretty simple. They are:",
@@ -30,9 +32,12 @@ responses = { # Eventually, this will all be pulled from a database editable on 
         "Keep a safe riding distance",
         "Stagger while riding",
         "Don't wear loose clothes that might get caught",
-        "Be careful where you point your flashlight",
+        "Be careful where you point your flashlight (@Dylan)",
         "Know your limits, and ride within them",
         "Communicate with your fellow riders",
+        "Come prepared to rides (Charger, water, light, etc.)",
+        "Keep some form of emergency contact on you (Or fill out our emergency contact form /econtact)",
+        "Do not share crash videos of someone without their permission",
         "Have fun!"
     ],
     "nosedive": "<a href='https://www.youtube.com/watch?v=kc6IEVV9mp0'>ayy lmao</a>", # stolen directly from ChiPEV

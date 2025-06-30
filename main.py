@@ -67,6 +67,7 @@ commands_map = {
     "pads": user_commands.pads,
     "i2s": user_commands.i2s,
     "rides": user_commands.rides,
+    "econtact": user_commands.econtact,
 }
 
 admin_commands_map = {
