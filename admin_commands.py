@@ -50,7 +50,7 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) == 0:
         await context.bot.send_message(update.effective_chat.id, "Please provide a message to announce.")
         return
-    message = " ".join(context.args)
+    message = f"Announcement from {ub.update.effective_user}:\n\n".join(context.args)
     message = await ub.send_message(message)
 
     await message.pin()
