@@ -116,7 +116,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def econtact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
     logger.debug("Emergency contact command called")
-    await ub.send_message(f"Please fill out our emergency contact form: {data.emergency_contact_form_url}")
+    await ub.send_message(f"Please fill out this form to provide group admins with emergency contact information: {data.emergency_contact_form_url}")
     return
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):

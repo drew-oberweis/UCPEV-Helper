@@ -7,14 +7,15 @@ logger = logging.getLogger(__name__)
 class Ride:
     def __init__(self):
         self.id = ""
+        self.name = ""
         self.type = ""
         self.date = ""
         self.time = ""
-        self.meetup_location = ""
-        self.destination = ""
+        self.route = ""
         self.pace = "" 
         self.description = ""
         self.id = ""
+        self.organizer = ""
     
     # allow a ride to be compared to another, with the comparison being based on the ride date
     def __lt__(self, other):
@@ -46,7 +47,7 @@ class Ride:
         # convert unix timestamp into mm/dd/yyyy format
         logger.log(logging.DEBUG, f"Ride date: {self.date}")
         if (self.type == "Short" or self.type == "Long"):
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\nDestination: {self.__desanitize(self.destination)}\nPace: {self.pace}\n\n{self.__desanitize(self.description)}"
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: \nRoute: {self.route}\nPace: {self.pace}\n\n{self.__desanitize(self.description)}"
         else:
             return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
         
@@ -77,14 +78,16 @@ class Ride:
             raise ValueError(f"Invalid date attempted for ride {self.id}")
     def set_time(self, ride_time):
         self.time = ride_time
-    def set_meetup(self, meetup_location):
-        self.meetup_location = meetup_location
-    def set_destination(self, destination):
-        self.destination = destination
+    def set_route(self, route):
+        self.route = route
     def set_description(self, description):
         self.description = description
     def set_id(self, ride_id):
         self.id = ride_id
+    def set_organizer(self, organizer):
+        self.organizer = organizer
+    def set_name(self, name):
+        self.name = name
     def set_pace(self, pace): 
         if(Verifiers.verify_pace(pace)):
             self.pace = pace
