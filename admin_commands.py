@@ -20,6 +20,8 @@ import utils
 import environment_handler
 import db
 from utils import UpdateBundle
+import sheets_interface as shit
+from ride import Ride
 
 logger = logging.getLogger(__name__)
 token, db_creds = environment_handler.get_env_vars()
@@ -65,13 +67,17 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     ub = UpdateBundle(update, context)
 
-    try:
-        selected_id = context.args[0]
-    except IndexError:
-        selected_id = None
-    
-    session = db.Session(db_creds)
-    ride = session.get_ride(selected_id)
+    ride_inf = shit.get_rides()[0]
+
+    ride = Ride()
+
+    ride.set_organizer(ride_inf[0])
+    ride.set_name(ride_inf[1])
+    ride.set_date(ride_inf[2])
+    ride.set_time(ride_inf[3])
+    ride.set_route(ride_inf[4])
+    ride.set_pace(ride_inf[5])
+    ride.set_description(ride_inf[6])
 
     if not ride:
         await ub.send_message("Ride not found.")
@@ -96,7 +102,7 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     poll_expiration_datetime = datetime.fromtimestamp(poll_expiration)
 
     # Delete the command message
-    await context.bot.delete_message(update.effective_chat.id, update.message.message_id)
+    await context.bot.delete_message(update.effective_chat.id, update.message.message_id) #TODO: implement this using UpdateBundle
 
     # Send ride info message
     message = f"Ride info:\n{ride}"
