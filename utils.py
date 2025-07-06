@@ -32,35 +32,6 @@ token, db_creds = environment_handler.get_env_vars()
 
 logger = logging.getLogger(__name__)
 
-async def is_admin(user: User):
-
-    db_creds = db.DB_Credentials(
-        host=os.getenv("postgres_host", None),
-        user=os.getenv("postgres_user", None),
-        password=os.getenv("postgres_pass", None),
-        database=os.getenv("postgres_db", None)
-    )
-
-    session = db.Session(db_creds)
-
-    db_user = session.get_user(user.id)
-
-    if not db_user:
-        logger.log(logging.INFO, f"User {user.id} does not exist in the database")
-        return False
-
-    status = db_user[2]
-
-    logger.log(logging.INFO, f"User {user.id} is an admin: {db_user}")
-
-    if status == "True":
-        status = True
-    else:
-        status = False
-
-    logger.log(logging.INFO, f"User {user.id} is{' not' if not status else ''} an admin")
-    return status
-
 class UpdateBundle:
     def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         self.update = update
@@ -134,6 +105,7 @@ def send_discord_webhook(url: str, message: str, ping_all: bool = False):
     return response
 
 def output_telegram_autocomplete():
+
     output = ""
 
     for i in data.command_descriptions:
@@ -144,3 +116,22 @@ def output_telegram_autocomplete():
 
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
+
+async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if(update.effective_chat.type == "private"):
+        return False
+
+    chat_id = update.effective_chat.id
+    user_id = update.effective_user.id
+    is_admin = False
+
+    try:
+        chat_admins = await context.bot.get_chat_administrators(chat_id)
+        
+        for admin in chat_admins:
+            if(admin.user.id == user_id):
+                return True
+    except Exception as e:
+        logger.error(f"Error getting chat admins: {e}")
+        return False
+    return is_admin
