@@ -106,7 +106,7 @@ def get_route(name):
 
     return route
 
-def refresh_token():
+async def refresh_token(context):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -115,6 +115,7 @@ def refresh_token():
     if os.path.exists("google_token.json"):
         try:
             creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
+            logger.log(logging.INFO, "Token loaded successfully")
         except Exception as e:
             logger.log(logging.ERROR, f"Error loading token.json: {e}")
             creds = None
@@ -125,11 +126,21 @@ def refresh_token():
             logger.log(logging.INFO, "Token refreshed")
         else:
             raise Exception("Outdated Credentials")
+    logger.log(logging.INFO, "No refresh needed, token is valid")
 
 if __name__ == "__main__":
-    result = get_rides()[0]
-    print(result)
-    print(f"Length: {len(result)}")
-    result_2 = get_route(result[4])
-    print(result_2)
-    print(f"Length: {len(result_2)}")
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())

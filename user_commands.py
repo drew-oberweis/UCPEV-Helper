@@ -116,13 +116,17 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def econtact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
     logger.debug("Emergency contact command called")
-    await ub.send_message(f"Please fill out our emergency contact form: {data.emergency_contact_form_url}")
+    await ub.send_message(f"Please fill out this form to provide group admins with emergency contact information: {data.emergency_contact_form_url}")
     return
 
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
 
-    ride_inf = shit.get_rides()[0]
+    try:
+        ride_inf = shit.get_rides()[0]
+    except IndexError as e:
+        await ub.send_message("There are no scheduled rides.")
+        return
 
     organizer = ride_inf[0]
     name = ride_inf[1]
