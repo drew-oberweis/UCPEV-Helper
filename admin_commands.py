@@ -142,3 +142,6 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # send poll
     await context.bot.send_poll(update.effective_chat.id, question=poll_message, options=poll_options, is_anonymous=False, allows_multiple_answers=False, message_thread_id=update.effective_message.message_thread_id)
+
+    webhook_url = environment_handler.get_discord_webhook()
+    utils.send_discord_webhook(webhook_url, "Ride poll posted in Telegram! Head over there to check it out!", True)
