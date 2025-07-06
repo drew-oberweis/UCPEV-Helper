@@ -49,7 +49,7 @@ class Ride:
         if (self.type == "Short" or self.type == "Long"):
             return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: \nRoute: {self.route}\nPace: {self.pace}\n\n{self.__desanitize(self.description)}"
         else:
-            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nMeetup: {self.__desanitize(self.meetup_location)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
+            return f"Ride type: {self.type}\nDate: {self.nice_date()}\nTime: {self.__desanitize(self.time)}\nRoute: {self.__desanitize(self.route)}\n\n{self.__desanitize(self.description)}" # skip destination for I2S and Other rides
         
     def str_one_line(self):
         if (self.type == "Short" or self.type == "Long"):
@@ -104,7 +104,7 @@ class Verifiers:
     def verify_type(ride_type):
         return ride_type in Ride.ride_type_options
     def verify_date(date): # for static method
-        regex_date = "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$" # TODO: unify this into utils.py or something
+        regex_date = "^([1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$" # TODO: unify this into utils.py or something
         if(not(re.match(regex_date, date))):
             logger.log(logging.DEBUG, f"Date {date} did not pass date validation from regex mismatch")
             return False
