@@ -85,7 +85,7 @@ def main():
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-    app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
+    # app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
 
     app.job_queue.run_repeating(refresh_token, interval=60*60*24)
 
