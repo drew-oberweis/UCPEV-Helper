@@ -68,7 +68,7 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
 
     try:
-        ride_inf = shit.get_rides()[0]
+        ride_inf = shit.get_upcoming_rides()[0]
     except IndexError as e:
         await ub.send_message("There are no rides scheduled")
         return

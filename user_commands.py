@@ -123,47 +123,47 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
 
     try:
-        ride_inf = shit.get_rides()[0]
+        # get the next ride
+        rides = shit.get_upcoming_rides()
+        ride = rides[0]
     except IndexError as e:
         await ub.send_message("There are no scheduled rides.")
         return
 
-    organizer = ride_inf[0]
-    name = ride_inf[1]
-    date = ride_inf[2]
-    time = ride_inf[3]
-    route = ride_inf[4]
-    pace = ride_inf[5]
-    extra = ride_inf[6]
+    route = shit.get_route(ride.route)
 
-    route_inf = shit.get_route(route)
+    logger.debug(f"Selected route: {route}")
 
-    start_loc = route_inf[1]
-    start_pin = route_inf[2]
-    notable_loc = route_inf[3]
-    end_loc = route_inf[4]
-    end_pin = route_inf[5]
-    dist = route_inf[6]
-    gaia_link = route_inf[7]
-    route_desc = route_inf[8]
-    route_extra = route_inf[9]
+    start_loc = route["Start Location"][0]
+    start_pin = route["Start Location Pin"][0]
+    notable_loc = route["Notable Location"][0]
+    end_loc = route["End Location"][0]
+    end_pin = route["End Location Pin"][0]
+    dist = route["Est. Distance"][0]
+    gaia_link = route["Gaia Link"][0]
+    route_desc = route["Route Description"][0]
+    route_extra = route["Extra"][0]
 
-    if extra != "":
+    extra = ride.description
+
+    if extra != "": # line breaks are separate to avoid adding 2 extra blank lines to the message
         extra = f"\n\n{extra}"
 
-    ride_message = f"{name}\nOrganizer: {organizer}\n\nDate/Time: {date} @ {time}\nPace: {pace}{extra}"
+    ride_message = f"{ride.name}\nOrganizer: {ride.organizer}\n\nDate/Time: {ride.nice_date()} @ {ride.time}\nPace: {ride.pace}{extra}"
+
+    logger.debug(f"start_pin is {start_pin}")
     
-    if start_pin == "":
+    if start_pin != start_pin:
         start_msg = f"Start Location: {start_loc}"
     else:
         start_msg = f"Start Location: {start_loc} ({start_pin})"
 
-    if end_pin == "":
+    if end_pin != end_pin:
         end_msg = f"End Location: {end_loc}"
     else:
         end_msg = f"End Location: {end_loc} ({end_pin})"
 
-    route_message = f"Route Name: {route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
+    route_message = f"Route Name: {ride.route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
 
     message = ride_message + "\n\n" + route_message
 
