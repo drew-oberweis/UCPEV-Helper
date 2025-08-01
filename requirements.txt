@@ -8,6 +8,7 @@ kaleido
 numpy
 pandas
 plotly
+tabulate
 
 google-api-python-client==1.7.9
 google-auth-httplib2==0.0.3

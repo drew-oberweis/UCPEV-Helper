@@ -1,6 +1,7 @@
 import datetime
 import re
 import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,7 @@ class Ride:
             raise ValueError(f"Invalid pace attempted for ride {self.id}")
 
     ride_type_options = ["Short", "Long", "I2S", "Other"]
-    ride_pace_options = ["Casual", "Fast", "Both (Separate rides)"]
+    ride_pace_options = ["Beginner", "Casual", "Fast", "I2S", "Multiple Rides (Different Paces)"]
 
 class Verifiers:
     def verify_pace(pace):
@@ -110,3 +111,17 @@ class Verifiers:
             return False
         logger.log(logging.DEBUG, f"Date {date} passed date validation")
         return True
+    
+def get_rides_from_df(df: pd.DataFrame) -> list[Ride]:
+    rides = []
+    for index, row in df.iterrows():
+        ride = Ride()
+        ride.set_organizer(row['Organizer'])
+        ride.set_name(row['Ride'])
+        ride.set_date(row['Date'])
+        ride.set_time(row['Time'])
+        ride.set_route(row['Route'])
+        ride.set_pace(row['Pace'])
+        ride.set_description(row['Extra'])
+        rides.append(ride)
+    return rides
