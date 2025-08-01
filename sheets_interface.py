@@ -14,20 +14,11 @@ sheet_id = '1elIIh9jrFYl2tBIUDy3sIHrNXBirY2wh7naDZacp0SY'
 routes_gid = '0'
 rides_gid = '1259448335'
 cleaned_gid = '360455255'
-routes_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:json&gid={routes_gid}'
-rides_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:json&gid={rides_gid}'
-cleaned_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:json&gid={cleaned_gid}'
+routes_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={routes_gid}'
+rides_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={rides_gid}'
+cleaned_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={cleaned_gid}'
 
 def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
-    
-    sheet_id = '1elIIh9jrFYl2tBIUDy3sIHrNXBirY2wh7naDZacp0SY'
-    routes_gid = '0'
-    rides_gid = '1259448335'
-    cleaned_gid = '360455255'
-    routes_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={routes_gid}'
-    rides_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={rides_gid}'
-    cleaned_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={cleaned_gid}'
-
     # TODO: Implement caching because this can be slow
 
     output = None
