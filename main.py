@@ -23,6 +23,7 @@ import db
 import environment_handler
 import custom_handlers as c_handlers
 import utils
+from utils import UpdateBundle
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -75,6 +76,12 @@ admin_commands_map = {
     "make_ride_poll": admin_commands.make_ride_poll,
 }
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log the error and send a message to the user."""
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    ub = UpdateBundle(update, context)
+    await ub.send_message("An error occurred while processing your request. Please try again later.\n\nError message: " + str(context.error))
+
 def main():
     app = Application.builder().token(token).build()
 
@@ -85,6 +92,8 @@ def main():
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
     # app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
+
+    app.add_error_handler(error_handler)
 
     command_list = utils.output_telegram_autocomplete()
     # write the command list to a file
