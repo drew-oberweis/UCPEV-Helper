@@ -3,6 +3,9 @@ import logging
 
 import pandas as pd
 import ride
+import route
+
+from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
@@ -27,21 +30,20 @@ def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
 
     # TODO: Implement caching because this can be slow
 
+    output = None
+
     if(page == 1):
         logger.debug("Page 1 requested, returning routes")
         output = pd.read_csv(routes_url)
-        logger.debug(f"Routes data: {output.head()}")
-        return output
+        # logger.debug(f"Routes data: {output.head()}")
     elif(page == 2):
         logger.debug("Page 2 requested, returning rides")
         output = pd.read_csv(rides_url)
-        logger.debug(f"Rides data: {output.head()}")
-        return output
+        # logger.debug(f"Rides data: {output.head()}")
     elif(page == 3):
         logger.debug("Page 3 requested, returning cleaned rides")
         output = pd.read_csv(cleaned_url)
-        logger.debug(f"Cleaned rides data: {output.head()}")
-        return output
+        # logger.debug(f"Cleaned rides data: {output.head()}")
     elif(page == None):
         # Return all sheets as a dictionary
         logger.debug("No page requested, returning all sheets")
@@ -50,8 +52,13 @@ def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
             'rides': pd.read_csv(rides_url),
             'cleaned': pd.read_csv(cleaned_url)
         }
-        logger.debug(f"All sheets data: {output}")
-        return output
+        # logger.debug(f"All sheets data: {output}")
+
+    # print column names for debugging
+    debug_print = output.columns.tolist()
+    logger.debug(f"COLUMNS: {debug_print}")
+
+    return output
 
 def get_upcoming_rides() -> list[ride.Ride]:
         
@@ -63,17 +70,14 @@ def get_upcoming_rides() -> list[ride.Ride]:
         raise IndexError("No upcoming rides found.")
         
     return rides
-    
-
 
 def get_route(name) -> pd.DataFrame:
     
-    routes = __pull_sheets(1) # 1 is routes
-    route = routes[routes['Name'].str.contains(name)]
-    if route.empty:
-        raise ValueError(f"Route '{name}' not found.")
-    # Reset index for consistency
-    route = route.reset_index(drop=True)
+    routes_df = __pull_sheets(1) # 1 is routes
+    routes = route.get_routes_from_df(routes_df)
 
+    for r in routes:
+        if r.route == name:
+            return r
 
-    return route
+    return None

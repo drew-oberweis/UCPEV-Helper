@@ -150,20 +150,8 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
         extra = f"\n\n{extra}"
 
     ride_message = f"{ride.name}\nOrganizer: {ride.organizer}\n\nDate/Time: {ride.nice_date()} @ {ride.time}\nPace: {ride.pace}{extra}"
-
-    logger.debug(f"start_pin is {start_pin}")
     
-    if start_pin != start_pin:
-        start_msg = f"Start Location: {start_loc}"
-    else:
-        start_msg = f"Start Location: {start_loc} ({start_pin})"
-
-    if end_pin != end_pin:
-        end_msg = f"End Location: {end_loc}"
-    else:
-        end_msg = f"End Location: {end_loc} ({end_pin})"
-
-    route_message = f"Route Name: {ride.route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
+    route_message = f"{route}" # force casting
 
     message = ride_message + "\n\n" + route_message
 
