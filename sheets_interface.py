@@ -77,7 +77,7 @@ def get_route(name) -> pd.DataFrame:
     routes = route.get_routes_from_df(routes_df)
 
     for r in routes:
-        if r.route == name:
+        if r.name == name:
             return r
 
     return None

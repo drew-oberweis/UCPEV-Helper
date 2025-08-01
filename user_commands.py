@@ -130,21 +130,15 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await ub.send_message("There are no scheduled rides.")
         return
 
+    # get the route of the selected ride
     route = shit.get_route(ride.route)
+    if not route:
+        await ub.send_message("Route not found.")
+        return
 
-    logger.debug(f"Selected route: {route}")
+    logger.debug(route)
 
-    start_loc = route["Start Location"][0]
-    start_pin = route["Start Location Pin"][0]
-    notable_loc = route["Notable Location"][0]
-    end_loc = route["End Location"][0]
-    end_pin = route["End Location Pin"][0]
-    dist = route["Est. Distance"][0]
-    gaia_link = route["Gaia Link"][0]
-    route_desc = route["Route Description"][0]
-    route_extra = route["Extra"][0]
-
-    extra = ride.description
+    extra = ride.description # pulled to enable cleaning up of rides with no description
 
     if extra != "": # line breaks are separate to avoid adding 2 extra blank lines to the message
         extra = f"\n\n{extra}"
