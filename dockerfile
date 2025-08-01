@@ -11,7 +11,7 @@ ADD db.py /app
 ADD environment_handler.py /app
 ADD custom_handlers.py /app
 ADD ride.py /app
-
+ADD route.py /app
 ADD sheets_interface.py /app
 
 WORKDIR /app

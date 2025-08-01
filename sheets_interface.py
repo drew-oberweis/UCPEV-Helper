@@ -1,148 +1,74 @@
 import os.path
 import logging
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+import pandas as pd
+import ride
+import route
+
+from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
-# If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+# sheet info, this should probably be in a config file but its 1am and I don't care
+sheet_id = '1elIIh9jrFYl2tBIUDy3sIHrNXBirY2wh7naDZacp0SY'
+routes_gid = '0'
+rides_gid = '1259448335'
+cleaned_gid = '360455255'
+routes_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={routes_gid}'
+rides_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={rides_gid}'
+cleaned_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={cleaned_gid}'
 
-# The ID and range of a sample spreadsheet.
-spreadsheet_id = "1elIIh9jrFYl2tBIUDy3sIHrNXBirY2wh7naDZacp0SY"
+def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
+    # TODO: Implement caching because this can be slow
 
-def __get_sheet():
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
-    """
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists("google_token.json"):
-        try:
-            creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
-        except Exception as e:
-            print(f"Error loading token.json: {e}")
-            print(f"Found token file: {os.path.exists('google_token.json')}")
-            print(f"Token file contents: {open('google_token.json').read()}")
-            print(f"Found creds file: {os.path.exists('google_creds.json')}")
-            print(f"Creds file contents: {open('google_creds.json').read()}")
-            creds = None
-    # If there are no (valid) credentials available, attempt to refresh
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            raise Exception("Outdated Credentials")
+    output = None
 
-    try:
-        service = build("sheets", "v4", credentials=creds)
+    if(page == 1):
+        logger.debug("Page 1 requested, returning routes")
+        output = pd.read_csv(routes_url)
+        # logger.debug(f"Routes data: {output.head()}")
+    elif(page == 2):
+        logger.debug("Page 2 requested, returning rides")
+        output = pd.read_csv(rides_url)
+        # logger.debug(f"Rides data: {output.head()}")
+    elif(page == 3):
+        logger.debug("Page 3 requested, returning cleaned rides")
+        output = pd.read_csv(cleaned_url)
+        # logger.debug(f"Cleaned rides data: {output.head()}")
+    elif(page == None):
+        # Return all sheets as a dictionary
+        logger.debug("No page requested, returning all sheets")
+        output = {
+            'routes': pd.read_csv(routes_url),
+            'rides': pd.read_csv(rides_url),
+            'cleaned': pd.read_csv(cleaned_url)
+        }
+        # logger.debug(f"All sheets data: {output}")
 
-        # Call the Sheets API
-        sheet = service.spreadsheets()
+    # print column names for debugging
+    debug_print = output.columns.tolist()
+    logger.debug(f"COLUMNS: {debug_print}")
 
-    except HttpError as err:
-        raise err
-    
-    return sheet
+    return output
 
-def get_rides():
+def get_upcoming_rides() -> list[ride.Ride]:
         
-        sheet = __get_sheet()
+    rides_df = __pull_sheets(3) # 3 is cleaned rides, we only care about that here
 
-        data_range = "RideQuery!A2:G"
+    rides = ride.get_rides_from_df(rides_df)
+
+    if len(rides) == 0:
+        raise IndexError("No upcoming rides found.")
+        
+    return rides
+
+def get_route(name) -> pd.DataFrame:
     
-        result = (
-            sheet.values()
-            .get(spreadsheetId=spreadsheet_id, range=data_range)
-            .execute()
-        )
-        values = result.get("values", [])
+    routes_df = __pull_sheets(1) # 1 is routes
+    routes = route.get_routes_from_df(routes_df)
 
-        # pad the array to ALWAYS have 7 elements
+    for r in routes:
+        if r.name == name:
+            return r
 
-        for row in values:
-            while len(row) < 7:
-                row.append("")
-
-        return values
-
-    #TODO: Have this function return a list of Ride objects instead of a list of lists
-
-    
-
-
-def get_route(name):
-    if(name == None):
-        return None
-    
-    sheet = __get_sheet()
-
-    data_range = "Routes!A2:J"
-
-    result = (
-        sheet.values()
-        .get(spreadsheetId=spreadsheet_id, range=data_range)
-        .execute()
-    )
-    values = result.get("values", [])
-
-    # name is the first column in the range
-
-    route = None
-
-    for row in values:
-        if row[0] == name:
-            route = row[0:]
-
-    # pad the array to ALWAYS have 10 elements
-
-
-    while len(route) < 10:
-        route.append("")
-
-    return route
-
-async def refresh_token(context):
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    logger.log(logging.INFO, "Refreshing token...")
-    if os.path.exists("google_token.json"):
-        try:
-            creds = Credentials.from_authorized_user_file("google_token.json", SCOPES)
-            logger.log(logging.INFO, "Token loaded successfully")
-        except Exception as e:
-            logger.log(logging.ERROR, f"Error loading token.json: {e}")
-            creds = None
-    # If there are no (valid) credentials available, attempt to refresh
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            logger.log(logging.INFO, "Token refreshed")
-        else:
-            raise Exception("Outdated Credentials")
-    logger.log(logging.INFO, "No refresh needed, token is valid")
-
-if __name__ == "__main__":
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
+    return None
