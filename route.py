@@ -17,6 +17,11 @@ class Route:
         self.extra = ""
 
     def __str__(self):
+
+        # return empty string if route is "Other Event" to avoid cluttering the output
+        if self.name == "Other Event":
+            return ""
+
         if self.start_pin != self.start_pin:
             self.start_msg = f"Start Location: {self.start_location}"
         else:

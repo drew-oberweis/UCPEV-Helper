@@ -147,6 +147,9 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     route_message = f"{route}" # force casting
 
-    message = ride_message + "\n\n" + route_message
+    if route_message == "":
+        message = ride_message
+    else:
+        message = ride_message + "\n\n" + route_message
 
     await ub.send_message(message)
