@@ -4,9 +4,6 @@ import os
 import sys
 import asyncio
 
-# for flask
-from flask import Flask, jsonify, request
-
 from telegram import (
     Update
 )
@@ -28,8 +25,6 @@ import environment_handler
 import custom_handlers as c_handlers
 import utils
 from utils import UpdateBundle
-import ride_convo_handlers
-import flask_listener
 
 prog_start_time = time.time()
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
@@ -88,7 +83,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     ub = UpdateBundle(update, context)
     await ub.send_message("An error occurred while processing your request. Please try again later.\n\nError message: " + str(context.error))
 
-def main():
+async def main():
     app = Application.builder().token(token).build()
 
     for i in commands_map:
@@ -111,8 +106,6 @@ def main():
     await app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
     
     # Now the bot is running, and we can run new code here
-
-    flask_listener.start(app.bot, utils.send_message_to_chat)
 
     while True: # This should remain the last thing in the main loop, the stopping code below should never be reached
         await asyncio.sleep(5)
