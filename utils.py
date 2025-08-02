@@ -23,12 +23,11 @@ from telegram.constants import (
     ParseMode,
 )
 
-import db
 from discord_webhook import DiscordWebhook
 import data
 import environment_handler
 
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_env_vars()
 
 logger = logging.getLogger(__name__)
 

@@ -14,7 +14,6 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 import data
-import db
 import ride
 from utils import UpdateBundle
 import sheets_interface as shit

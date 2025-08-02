@@ -7,7 +7,6 @@ ADD requirements.txt /app
 ADD user_commands.py /app
 ADD utils.py /app
 ADD data.py /app
-ADD db.py /app
 ADD environment_handler.py /app
 ADD custom_handlers.py /app
 ADD ride.py /app

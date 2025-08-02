@@ -1,7 +1,6 @@
 import os
 import sys
 from dotenv import load_dotenv 
-import db
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,17 +12,7 @@ def get_env_vars():
     except KeyError:
         logger.error("Telegram token not found in environment variables.")
         token = None
-    try:
-        db_creds = db.DB_Credentials(
-            host=os.environ["postgres_host"],
-            user=os.environ["postgres_user"],
-            password=os.environ["postgres_pass"],
-            database=os.environ["postgres_db"]
-        )
-    except KeyError:
-        logger.error("Database credentials not found in environment variables.")
-        db_creds = None
-    return token, db_creds
+    return token
 
 def get_discord_webhook():
     load_dotenv()

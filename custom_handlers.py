@@ -17,12 +17,12 @@ from telegram.ext import (
 import user_commands
 import admin_commands
 import data
-import db
+
 import environment_handler
 import utils
 
 logger = logging.getLogger(__name__)
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_env_vars()
 
 # def do_nothing():
 #     return None

@@ -18,13 +18,12 @@ from telegram.constants import ParseMode
 import data
 import utils
 import environment_handler
-import db
 from utils import UpdateBundle
 import sheets_interface as shit
 from ride import Ride
 
 logger = logging.getLogger(__name__)
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_env_vars()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
