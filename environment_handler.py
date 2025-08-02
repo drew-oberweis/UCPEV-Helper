@@ -46,24 +46,3 @@ def get_log_level():
     else:
         logger.warning("Invalid log level or no log level present in environment variables. Defaulting to INFO.")
         return logging.INFO # info should be default
-    
-def generate_google_creds():
-    logger.info("Pulling Google credentials...")
-    # Load environment variables and store them into the correct files
-    load_dotenv()
-
-    creds = os.getenv("GOOGLE_CREDS_FILE")
-    token = os.getenv("GOOGLE_TOKEN_FILE")
-
-    if creds is None or token is None:
-        logger.error("Google credentials or token not found in environment variables.")
-        return None, None
-    
-    with open("google_creds.json", "w") as f:
-        f.write(creds)
-    with open("google_token.json", "w") as f:
-        f.write(token)
-
-    logger.info("Google credentials pulled.")
-
-    return "google_creds.json", "google_token.json"

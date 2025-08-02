@@ -56,7 +56,6 @@ db_creds = db.DB_Credentials(
 log_level = environment_handler.get_log_level()
 logging.basicConfig(format=log_format, level=log_level, stream=sys.stdout)
 
-environment_handler.generate_google_creds()
 
 commands_map = {
     "nosedive": user_commands.nosedive,
