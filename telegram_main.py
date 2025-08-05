@@ -52,10 +52,13 @@ admin_commands_map = {
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log the error and send a message to the user."""
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
-    ub = UpdateBundle(update, context)
-    await ub.send_message("An error occurred while processing your request. Please try again later.\n\nError message: " + str(context.error))
+    try:
+        ub = UpdateBundle(update, context)
+        await ub.send_message("An error occurred while processing your request. Please try again later.\n\nError message: " + str(context.error))
+    except Exception as e:
+        logger.error(f"Error in error handler: {e}")
 
-def main():
+def main(queue=None):
     logger.info("Telgram bot start initiated")
     app = Application.builder().token(token).build()
 
