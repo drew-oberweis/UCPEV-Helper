@@ -18,7 +18,8 @@ command_descriptions = {
 admin_command_descriptions = {
     "test_admin": "Tests if the user is an admin",
     "announce": "Announces a message to the group and mirror it in the Discord",
-    "make_ride_poll": "Makes a poll for the next ride (or a selected ride)"
+    "make_ride_poll": "Makes a poll for the next ride (or a selected ride)",
+    "send_topic_id": "Sends the topic ID of the current topic (for admin use only)",
 }
 
 emergency_contact_form_url = "https://forms.gle/ZooQHi9JM5Jj2Jba7"
@@ -55,4 +56,33 @@ responses = { # Eventually, this will all be pulled from a database editable on 
     "pads": "TSG, G-Form, Revzilla\n\n<a href='https://g-form.com/'>GForm</a>\n<a href='https://www.revzilla.com'>Revzilla</a>",
     "i2s": "Intro 2 Speed (I2S) is an event where new and experienced riders can practice together and learn new skills. It is a great way to meet other riders and learn how to ride safely. We try to hold I2S every week at lot E14 when weather permits, but it occasionally gets moved, so keep up to date using /rides!",
     "inline": "Inline Insomniacs (Inline) is another RSO on campus that we very occasionally collaborate with for rides. They ride non-electric skateboards/longboards/skates, so rides with them are a slower pace and it is important that we are respectful of this. Make sure to not ride too fast or aggressively, and be sure to communicate with other riders. PEV's historically haven't been allowed to ride with them, and we want to keep this privilege, so please be respectful and follow their rules and only join them when explicitly allowed to."
+}
+
+chat_id_map_dev = {
+    "discord": {
+        "0": 1186544426835791874, # Telegram's "General" chat doesn't have a channel ID, it is just the group chat ID
+        "3": 1186544831892312164
+    },
+    "telegram": {
+        "1186544426835791874": "0",  # Telegram's "General" chat doesn't have a channel ID, it is just the group chat ID
+        "1186544831892312164": 3 
+    }
+}
+
+chat_id_map = {
+    "discord": {
+
+    },
+    "telegram": {
+        "1402431046015778928":, #general
+        "1402431131428589750":, #grouprides
+        "1402431181122965524":, #pics
+        "1402431078446268568":, #eskate
+        "1402431199493750924":, #escoot
+        "1402431219320229970":, #ebike
+        "1402431168099516487":, #euc
+        "1402431152744173578":, #other pev
+        "1402431104396431501":, #social media
+        "1402431253067726979":, #maintenance
+    }
 }

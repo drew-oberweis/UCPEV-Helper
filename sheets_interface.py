@@ -5,8 +5,6 @@ import pandas as pd
 import ride
 import route
 
-from tabulate import tabulate
-
 logger = logging.getLogger(__name__)
 
 # sheet info, this should probably be in a config file but its 1am and I don't care
