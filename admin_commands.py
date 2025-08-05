@@ -18,13 +18,12 @@ from telegram.constants import ParseMode
 import data
 import utils
 import environment_handler
-import db
 from utils import UpdateBundle
 import sheets_interface as shit
 from ride import Ride
 
 logger = logging.getLogger(__name__)
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -61,6 +60,12 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     utils.send_discord_webhook(webhook_url, message.text, True)
 
     await context.bot.delete_message(update.effective_chat.id, update.message.message_id)
+
+@confirm_admin
+async def send_topic_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
+    topic_id = ub.get_message().message_thread_id
+    await ub.send_message(f"Topic ID: {topic_id}")
 
 @confirm_admin
 async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):

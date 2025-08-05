@@ -4,7 +4,7 @@ import os
 import sys
 
 from telegram import (
-    Update
+    Update,
 )
 from telegram.ext import (
     Application,
@@ -17,48 +17,59 @@ from telegram.ext import (
 import user_commands
 import admin_commands
 import data
-import db
 import environment_handler
 import utils
+from message_queue import Message
 
 logger = logging.getLogger(__name__)
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
-# def do_nothing():
-#     return None
+def do_nothing():
+    return None
 
-# async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-#     # ignore if private chat
-#     if(update.effective_chat.type == "private"):
-#         return do_nothing()
+    ub = utils.UpdateBundle(update, context)
+
+    topic_id = ub.update.message.message_thread_id
+
+    if topic_id == None:
+        topic_id = 0
+
+    user = ub.get_user()
+    username = user.username
+
+    # ignore if private chat
+    if(ub.get_chat().type == "private"):
+        return do_nothing()
+
+    # ignore bot's own messages
+    if(user.is_bot):
+        return do_nothing()
+    if(update.effective_user.id == context.bot.id):
+        return do_nothing()
+
+    if(username == None):
+        try:
+            username = user.first_name + " " + user.last_name
+        except:
+            username = user.first_name
+
+    logger.debug(f"Received message from {username} ({user.id}) in chat {topic_id}: {update.effective_message.text}")
     
-#     is_admin = await is_admin(update, context)
+    # send message to discord using the correct webhook
+    
+    message = Message()
+    message.set_dest_platform("discord")
+    message.set_user(username)
+    message.set_message(update.effective_message.text)
+    message.set_chat_id("discord", topic_id)
 
-#     session = db.Session(db_creds)
-#     user = update.effective_user
-#     chat = update.effective_chat
-#     message = update.effective_message
-#     chat_id = chat.id
-#     user_id = user.id
-#     username = user.username
-#     content = message.text
+    webhook = message.get_discord_webhook()
 
-#     if(username == None):
-#         try:
-#             username = user.first_name + " " + user.last_name
-#         except:
-#             username = user.first_name
+    if webhook:
+        utils.send_discord_webhook(webhook, update.effective_message.text, False, username)
+    else:
+        logger.error(f"No webhook found for channel {message.get_chat_id()}. Cannot send message to Discord.")
 
-#     session.add_message(message.message_id, user_id, chat_id, content)
-
-#     stored_user = session.get_user(user_id=user_id)
-#     if(stored_user is None):
-#         session.add_user(username, user_id, is_admin)
-#         return do_nothing()
-
-#     if(stored_user[0] != username or stored_user[2] != is_admin): # update user if username or admin status has changed
-#         session.update_user(user_id, username, is_admin)
-
-
-#     return do_nothing() # needed as a fake callback, otherwise it throws errors
+    return do_nothing() # needed as a fake callback, otherwise it throws errors

@@ -1,29 +1,54 @@
 import os
 import sys
 from dotenv import load_dotenv 
-import db
 import logging
 
 logger = logging.getLogger(__name__)
 
-def get_env_vars():
+def get_telegram_token():
     load_dotenv()
-    token = os.environ['telegram_token']
     try:
-        db_creds = db.DB_Credentials(
-            host=os.environ["postgres_host"],
-            user=os.environ["postgres_user"],
-            password=os.environ["postgres_pass"],
-            database=os.environ["postgres_db"]
-        )
+        token = os.environ['telegram_token']
     except KeyError:
-        logger.error("Database credentials not found in environment variables.")
-        db_creds = None
-    return token, db_creds
+        logger.error("Telegram token not found in environment variables.")
+        token = None
+    return token
 
-def get_discord_webhook():
+def get_discord_token():
     load_dotenv()
-    return os.getenv("discord_webhook")
+    try:
+        token = os.environ['discord_token']
+    except KeyError:
+        logger.error("Discord token not found in environment variables.")
+        token = None
+    return token
+
+def get_discord_webhook(channel: str) -> str:
+    load_dotenv()
+
+    try:
+        env_name = f"{channel}_webhook"
+        webhook = os.environ[env_name]
+        logger.debug(f"Found {webhook} while searching for {env_name} in environment variables.")
+        if not webhook:
+            raise ValueError(f"Webhook for {channel} is not set in environment variables.")
+        return webhook
+    except KeyError:
+        logger.error(f"{channel} webhook not found in environment variables.")
+        return None
+    
+def get_telegram_chat_id():
+    load_dotenv()
+    try:
+        chat_id = int(os.environ['telegram_chat_id'])
+    except KeyError:
+        logger.error("Telegram chat ID not found in environment variables.")
+        chat_id = None
+    except ValueError:
+        logger.error("Telegram chat ID in environment variables is not a valid integer.")
+        chat_id = None
+
+    return chat_id
 
 def get_log_level():
     load_dotenv()
@@ -42,24 +67,3 @@ def get_log_level():
     else:
         logger.warning("Invalid log level or no log level present in environment variables. Defaulting to INFO.")
         return logging.INFO # info should be default
-    
-def generate_google_creds():
-    logger.info("Pulling Google credentials...")
-    # Load environment variables and store them into the correct files
-    load_dotenv()
-
-    creds = os.getenv("GOOGLE_CREDS_FILE")
-    token = os.getenv("GOOGLE_TOKEN_FILE")
-
-    if creds is None or token is None:
-        logger.error("Google credentials or token not found in environment variables.")
-        return None, None
-    
-    with open("google_creds.json", "w") as f:
-        f.write(creds)
-    with open("google_token.json", "w") as f:
-        f.write(token)
-
-    logger.info("Google credentials pulled.")
-
-    return "google_creds.json", "google_token.json"

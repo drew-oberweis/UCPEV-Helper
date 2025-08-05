@@ -10,6 +10,7 @@ from telegram import (
     Chat,
     ChatMember,
     ChatMemberUpdated,
+    UserProfilePhotos
 )
 from telegram.ext import (
     Application,
@@ -23,12 +24,12 @@ from telegram.constants import (
     ParseMode,
 )
 
-import db
 from discord_webhook import DiscordWebhook
 import data
 import environment_handler
+from data import chat_id_map
 
-token, db_creds = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,12 @@ class UpdateBundle:
     async def send_reply(self, message: str):
         return await self.update.effective_message.reply_text(message)
 
+async def blind_send_message(chat_id: int, message: str, topic_id: int, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message to a chat without any context."""
+    try:
+        await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
+    except Exception as e:
+        raise Exception(f"Failed to send message to chat {chat_id}: {e}")
 # This is a direct rip from https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py
 def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
     """Takes a ChatMemberUpdated instance and extracts whether the 'old_chat_member' was a member
@@ -97,10 +104,10 @@ def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tup
 
     return was_member, is_member
 
-def send_discord_webhook(url: str, message: str, ping_all: bool = False):
+def send_discord_webhook(url: str, message: str, ping_all: bool = False, username: str = "UC PEV Helper", avatar_url: str = None) -> None:
     if ping_all:
         message = "@everyone " + message
-    webhook = DiscordWebhook(url=url, content=message, username="UC PEV Helper")
+    webhook = DiscordWebhook(url=url, content=message, username=username, avatar_url=avatar_url)
     response = webhook.execute()
     return response
 
