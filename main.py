@@ -6,6 +6,7 @@ import sys
 import telegram_main
 import discord_main
 import environment_handler
+from utils import Message, MessageQueue
 
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special
@@ -32,14 +33,17 @@ logger = logging.getLogger(__name__)
 logger.info("Logging initialized.")
 
 def launch_bots():
+
+    q = MessageQueue()
+
     logger.info("Starting Discord bot in separate thread...")
-    discord_thread = threading.Thread(target=discord_main.main)
+    discord_thread = threading.Thread(target=discord_main.main, args=(q,))
     discord_thread.start()
     logger.info("Discord bot started.")
 
-    telegram_main.main() # call the function to hand the main thread to the Telegram bot
+    telegram_main.main(q) # call the function to hand the main thread to the Telegram bot
 
-    logger.CRITICAL("Telegram bot has stopped running. Exiting program.")
+    logger.critical("Telegram bot has stopped running. Exiting program.")
 
 logger.info("Beginning bot startup...")
 

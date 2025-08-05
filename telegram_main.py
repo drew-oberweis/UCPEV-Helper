@@ -68,7 +68,15 @@ def main(queue=None):
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-    # app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
+
+    # Handling for message forwarding between platforms
+    app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
+    # add loop to run ever n seconds to check the queue for messages to forward
+    if queue is not None:
+        logger.info("Setting up message queue checking...")
+        app.job_queue.run_repeating(utils.check_queue, interval=1, first=0, data=queue)
+    else:
+        logger.warning("No message queue provided, this instance will not support message forwarding between platforms.")
 
     app.add_error_handler(error_handler)
 
