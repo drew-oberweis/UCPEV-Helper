@@ -22,7 +22,7 @@ import environment_handler
 import utils
 
 logger = logging.getLogger(__name__)
-token = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
 # def do_nothing():
 #     return None

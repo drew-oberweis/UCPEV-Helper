@@ -27,7 +27,7 @@ from discord_webhook import DiscordWebhook
 import data
 import environment_handler
 
-token = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
 logger = logging.getLogger(__name__)
 

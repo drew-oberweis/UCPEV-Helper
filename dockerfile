@@ -12,8 +12,10 @@ ADD custom_handlers.py /app
 ADD ride.py /app
 ADD route.py /app
 ADD sheets_interface.py /app
+ADD discord_main.py /app
+ADD telegram_main.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs
 RUN pip install -r requirements.txt
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]

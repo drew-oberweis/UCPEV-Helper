@@ -23,7 +23,7 @@ import sheets_interface as shit
 from ride import Ride
 
 logger = logging.getLogger(__name__)
-token = environment_handler.get_env_vars()
+token = environment_handler.get_telegram_token()
 
 def confirm_admin(func):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):

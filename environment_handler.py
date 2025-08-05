@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def get_env_vars():
+def get_telegram_token():
     load_dotenv()
     try:
         token = os.environ['telegram_token']
