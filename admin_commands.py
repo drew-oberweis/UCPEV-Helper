@@ -62,6 +62,12 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.delete_message(update.effective_chat.id, update.message.message_id)
 
 @confirm_admin
+async def send_topic_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ub = UpdateBundle(update, context)
+    topic_id = ub.get_message().message_thread_id
+    await ub.send_message(f"Topic ID: {topic_id}")
+
+@confirm_admin
 async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     ub = UpdateBundle(update, context)

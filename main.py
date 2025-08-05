@@ -21,6 +21,8 @@ logging.getLogger("telegram.ext.Application").setLevel(extraLogLevel)
 logging.getLogger("httpcore.connection").setLevel(extraLogLevel)
 logging.getLogger("telegram.ext.Updater").setLevel(extraLogLevel)
 logging.getLogger("telegram.ext.ConversationHandler").setLevel(extraLogLevel)
+logging.getLogger("apscheduler.scheduler").setLevel(extraLogLevel)
+logging.getLogger("apscheduler.executors.default").setLevel(extraLogLevel)
 
 log_level = environment_handler.get_log_level()
 logging.basicConfig(format=log_format, level=log_level, stream=sys.stdout, force=True)

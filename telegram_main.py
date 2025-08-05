@@ -46,6 +46,7 @@ admin_commands_map = {
     "test_admin": admin_commands.test_admin,
     "announce": admin_commands.announce,
     "make_ride_poll": admin_commands.make_ride_poll,
+    "send_topic_id": admin_commands.send_topic_id,
 }
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -18,7 +18,8 @@ command_descriptions = {
 admin_command_descriptions = {
     "test_admin": "Tests if the user is an admin",
     "announce": "Announces a message to the group and mirror it in the Discord",
-    "make_ride_poll": "Makes a poll for the next ride (or a selected ride)"
+    "make_ride_poll": "Makes a poll for the next ride (or a selected ride)",
+    "send_topic_id": "Sends the topic ID of the current topic (for admin use only)",
 }
 
 emergency_contact_form_url = "https://forms.gle/ZooQHi9JM5Jj2Jba7"
