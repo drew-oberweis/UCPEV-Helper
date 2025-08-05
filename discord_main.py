@@ -4,7 +4,7 @@ import time
 import sys
 
 import environment_handler
-from utils import MessageQueue, Message
+from message_queue import MessageQueue, Message
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,15 @@ def main(q: MessageQueue = None):
     async def on_message(message):
 
         if message.author == client.user:
+            logger.debug("Ignoring own message.")
             return
+
+        # ignore webhook messages
+        if message.webhook_id is not None:
+            logger.debug("Ignoring webhook message.")
+            return
+
+        logger.debug(message.webhook_id)
 
         global queue
         queue = q
@@ -36,7 +44,7 @@ def main(q: MessageQueue = None):
             logger.error("Message queue is not initialized.")
             return
 
-        logger.debug(f"Received message: {message.content} from {message.author} in channel {message.channel}")
+        logger.debug(f"Received message: {message.content} from {message.author} ({message.author.id}) in channel {message.channel}")
 
         if message.content.startswith("!hello"):
             await message.channel.send("Hello! I'm a bot.")
@@ -46,9 +54,7 @@ def main(q: MessageQueue = None):
         msg_obj.set_user(str(message.author))
         msg_obj.set_chat(str(message.channel))
         msg_obj.set_message(message.content)
-        msg_obj.set_chat_id("telegram",message.channel.id)
+        msg_obj.set_chat_id("telegram", message.channel.id)
         queue.add_message(msg_obj)
 
-            
-    logger.info(environment_handler.get_discord_token())
     client.run(environment_handler.get_discord_token())

@@ -23,6 +23,7 @@ import data
 import environment_handler
 import custom_handlers as c_handlers
 import utils
+import message_queue
 from utils import UpdateBundle
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ def main(queue=None):
     # add loop to run ever n seconds to check the queue for messages to forward
     if queue is not None:
         logger.info("Setting up message queue checking...")
-        app.job_queue.run_repeating(utils.check_queue, interval=1, first=0, data=queue)
+        app.job_queue.run_repeating(message_queue.check_queue, interval=1, first=0, data=queue)
     else:
         logger.warning("No message queue provided, this instance will not support message forwarding between platforms.")
 

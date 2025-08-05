@@ -6,7 +6,7 @@ import sys
 import telegram_main
 import discord_main
 import environment_handler
-from utils import Message, MessageQueue
+from message_queue import Message, MessageQueue
 
 log_filename = f"./logs/Log-{time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
 log_format = "%(asctime)s,%(name)s,%(levelname)s,%(message)s" # Logs readable as CSV because I am special

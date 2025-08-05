@@ -14,10 +14,6 @@ def get_telegram_token():
         token = None
     return token
 
-def get_discord_webhook():
-    load_dotenv()
-    return os.getenv("discord_webhook")
-
 def get_discord_token():
     load_dotenv()
     try:
@@ -26,6 +22,33 @@ def get_discord_token():
         logger.error("Discord token not found in environment variables.")
         token = None
     return token
+
+def get_discord_webhook(channel: str) -> str:
+    load_dotenv()
+
+    try:
+        env_name = f"{channel}_webhook"
+        webhook = os.environ[env_name]
+        logger.debug(f"Found {webhook} while searching for {env_name} in environment variables.")
+        if not webhook:
+            raise ValueError(f"Webhook for {channel} is not set in environment variables.")
+        return webhook
+    except KeyError:
+        logger.error(f"{channel} webhook not found in environment variables.")
+        return None
+    
+def get_telegram_chat_id():
+    load_dotenv()
+    try:
+        chat_id = int(os.environ['telegram_chat_id'])
+    except KeyError:
+        logger.error("Telegram chat ID not found in environment variables.")
+        chat_id = None
+    except ValueError:
+        logger.error("Telegram chat ID in environment variables is not a valid integer.")
+        chat_id = None
+
+    return chat_id
 
 def get_log_level():
     load_dotenv()
