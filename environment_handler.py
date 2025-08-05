@@ -18,6 +18,15 @@ def get_discord_webhook():
     load_dotenv()
     return os.getenv("discord_webhook")
 
+def get_discord_token():
+    load_dotenv()
+    try:
+        token = os.environ['discord_token']
+    except KeyError:
+        logger.error("Discord token not found in environment variables.")
+        token = None
+    return token
+
 def get_log_level():
     load_dotenv()
     raw =  os.getenv("log_level")

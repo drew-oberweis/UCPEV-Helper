@@ -50,5 +50,5 @@ def main(q: MessageQueue = None):
         queue.add_message(msg_obj)
 
             
-
-    client.run('NzU5NjAxMzI2NDI1NjM2ODY0.GgjTAP.Mrw9iWO98kX0jWKsT0FPECFxkuHdPEfpmsHlpw')
+    logger.info(environment_handler.get_discord_token())
+    client.run(environment_handler.get_discord_token())
