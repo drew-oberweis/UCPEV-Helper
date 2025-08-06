@@ -58,7 +58,7 @@ responses = { # Eventually, this will all be pulled from a database editable on 
     "inline": "Inline Insomniacs (Inline) is another RSO on campus that we very occasionally collaborate with for rides. They ride non-electric skateboards/longboards/skates, so rides with them are a slower pace and it is important that we are respectful of this. Make sure to not ride too fast or aggressively, and be sure to communicate with other riders. PEV's historically haven't been allowed to ride with them, and we want to keep this privilege, so please be respectful and follow their rules and only join them when explicitly allowed to."
 }
 
-chat_id_map_dev = {
+chat_id_map = {
     "discord": {
         "0": 1186544426835791874, # Telegram's "General" chat doesn't have a channel ID, it is just the group chat ID
         "3": 1186544831892312164
@@ -69,20 +69,20 @@ chat_id_map_dev = {
     }
 }
 
-chat_id_map = {
-    "discord": {
+# chat_id_map = {
+#     "discord": {
 
-    },
-    "telegram": {
-        "1402431046015778928":, #general
-        "1402431131428589750":, #grouprides
-        "1402431181122965524":, #pics
-        "1402431078446268568":, #eskate
-        "1402431199493750924":, #escoot
-        "1402431219320229970":, #ebike
-        "1402431168099516487":, #euc
-        "1402431152744173578":, #other pev
-        "1402431104396431501":, #social media
-        "1402431253067726979":, #maintenance
-    }
-}
+#     },
+#     "telegram": {
+#         "1402431046015778928":, #general
+#         "1402431131428589750":, #grouprides
+#         "1402431181122965524":, #pics
+#         "1402431078446268568":, #eskate
+#         "1402431199493750924":, #escoot
+#         "1402431219320229970":, #ebike
+#         "1402431168099516487":, #euc
+#         "1402431152744173578":, #other pev
+#         "1402431104396431501":, #social media
+#         "1402431253067726979":, #maintenance
+#     }
+# }
