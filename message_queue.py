@@ -68,13 +68,13 @@ class Message:
         if dest_platform == "discord":
             # Message is COMING FROM TELEGRAM
             self.telegram_chat_id = chat_id
-            self.discord_chat_id = chat_id_map["discord"].get(str(chat_id), None)
+            self.discord_chat_id = data.chat_id_map["discord"].get(str(chat_id), None)
             logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
             logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
         elif dest_platform == "telegram":
             # Message is COMING FROM DISCORD
             self.discord_chat_id = chat_id
-            self.telegram_chat_id = chat_id_map["telegram"].get(str(chat_id), None)
+            self.telegram_chat_id = data.chat_id_map["telegram"].get(str(chat_id), None)
             logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
             logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
         
