@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from data import chat_id_map, chat_id_map_dev
+import data
 from utils import blind_send_message
 import environment_handler
 
@@ -61,9 +61,9 @@ class Message:
 
         log_level = environment_handler.get_log_level()
         if log_level == "DEBUG":
-            id_map = chat_id_map_dev
+            id_map = data.chat_id_map_dev
         else:
-            id_map = chat_id_map
+            id_map = data.chat_id_map
 
         if dest_platform == "discord":
             # Message is COMING FROM TELEGRAM
