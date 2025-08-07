@@ -44,14 +44,14 @@ def main(q: MessageQueue = None):
             logger.error("Message queue is not initialized.")
             return
 
-        logger.debug(f"Received message: {message.content} from {message.author} ({message.author.id}) in channel {message.channel}")
+        logger.debug(f"Received message: {message.content} from {message.author.display_name} ({message.author.id}) in channel {message.channel}")
 
         if message.content.startswith("!hello"):
             await message.channel.send("Hello! I'm a bot.")
 
         msg_obj = Message()
         msg_obj.set_dest_platform("telegram")
-        msg_obj.set_user(str(message.author))
+        msg_obj.set_user(str(message.author.display_name))
         msg_obj.set_chat(str(message.channel))
         msg_obj.set_message(message.content)
         msg_obj.set_chat_id("telegram", message.channel.id)
