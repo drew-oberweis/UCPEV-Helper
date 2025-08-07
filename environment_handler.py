@@ -31,10 +31,10 @@ def get_discord_webhook(channel: str) -> str:
         webhook = os.environ[env_name]
         logger.debug(f"Found {webhook} while searching for {env_name} in environment variables.")
         if not webhook:
-            raise ValueError(f"Webhook for {channel} is not set in environment variables.")
+            raise ValueError(f"Webhook for {channel} is not set in environment variables when searching for {env_name}.")
         return webhook
     except KeyError:
-        logger.error(f"{channel} webhook not found in environment variables.")
+        logger.error(f"{channel} webhook not found in environment variables when searching for {env_name}.")
         return None
     
 def get_telegram_chat_id():

@@ -66,6 +66,7 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     message.set_chat_id("discord", topic_id)
 
     webhook = message.get_discord_webhook()
+    logger.debug(f"Webhook: {webhook}")
 
     if webhook:
         utils.send_discord_webhook(webhook, update.effective_message.text, False, username)

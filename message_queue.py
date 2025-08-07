@@ -60,21 +60,25 @@ class Message:
         # this code is fucked, but im too braindead to fix it right now. it sorta works?
 
         log_level = environment_handler.get_log_level()
-        if log_level == "DEBUG":
+        if log_level == logging.DEBUG:
+            logger.debug("Using dev channel map")
             id_map = data.chat_id_map_dev
         else:
+            logger.debug("Using prod channel map")
             id_map = data.chat_id_map
+
+        logger.debug(id_map)
 
         if dest_platform == "discord":
             # Message is COMING FROM TELEGRAM
             self.telegram_chat_id = chat_id
-            self.discord_chat_id = data.chat_id_map["discord"].get(str(chat_id), None)
+            self.discord_chat_id = id_map["discord"].get(str(chat_id), None)
             logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
             logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
         elif dest_platform == "telegram":
             # Message is COMING FROM DISCORD
             self.discord_chat_id = chat_id
-            self.telegram_chat_id = data.chat_id_map["telegram"].get(str(chat_id), None)
+            self.telegram_chat_id = id_map["telegram"].get(str(chat_id), None)
             logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
             logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
         
