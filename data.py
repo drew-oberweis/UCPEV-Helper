@@ -29,7 +29,7 @@ responses = { # Eventually, this will all be pulled from a database editable on 
     "rules_header": "The rules of this group are generally pretty simple. They are:",
     "rules": [
         "Wear a helmet",
-        "WEAR A HELMET",
+        "WEAR A HELMET: They are required for any rides casual and above, along with any I2S events.",
         "Follow the rules of the road",
         "Keep a safe riding distance",
         "Stagger while riding",
@@ -40,6 +40,7 @@ responses = { # Eventually, this will all be pulled from a database editable on 
         "Come prepared to rides (Charger, water, light, etc.)",
         "Keep some form of emergency contact on you (Or fill out our emergency contact form /econtact)",
         "Do not share crash videos of someone without their permission",
+        "We have very little AI tolerance. Keep it to a minimum and relevant, otherwise skip it. This rule specifically will have very little leniency."
         "Have fun!"
     ],
     "nosedive": "<a href='https://www.youtube.com/watch?v=kc6IEVV9mp0'>ayy lmao</a>", # stolen directly from ChiPEV
