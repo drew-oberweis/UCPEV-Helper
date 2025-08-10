@@ -35,8 +35,6 @@ def main(q: MessageQueue = None):
             logger.debug("Ignoring webhook message.")
             return
 
-        logger.debug(message.webhook_id)
-
         global queue
         queue = q
 
@@ -50,11 +48,10 @@ def main(q: MessageQueue = None):
             await message.channel.send("Hello! I'm a bot.")
 
         msg_obj = Message()
-        msg_obj.set_dest_platform("telegram")
         msg_obj.set_user(str(message.author.display_name))
         msg_obj.set_chat(str(message.channel))
         msg_obj.set_message(message.content)
-        msg_obj.set_chat_id("telegram", message.channel.id)
+        msg_obj.set_discord_topic_id(message.channel.id)
         queue.add_message(msg_obj)
 
     client.run(environment_handler.get_discord_token())
