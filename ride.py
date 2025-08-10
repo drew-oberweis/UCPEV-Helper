@@ -105,12 +105,20 @@ class Verifiers:
     def verify_type(ride_type):
         return ride_type in Ride.ride_type_options
     def verify_date(date): # for static method
-        regex_date = "^([1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/([0-9]{4})$" # TODO: unify this into utils.py or something
-        if(not(re.match(regex_date, date))):
+        regex_date = r"^([0]?[1-9]|1[0-2])/([0]?[1-9]|[12]\d|3[01])/(\d{2}|\d{4})$"
+        if not re.match(regex_date, date):
             logger.log(logging.DEBUG, f"Date {date} did not pass date validation from regex mismatch")
             return False
-        logger.log(logging.DEBUG, f"Date {date} passed date validation")
-        return True
+        try:
+            month, day, year = map(int, date.split('/'))
+            if len(str(year)) == 2:
+                year = 2000 + year
+            datetime.datetime(year, month, day)
+            logger.log(logging.DEBUG, f"Date {date} passed date validation")
+            return True
+        except ValueError:
+            logger.log(logging.DEBUG, f"Date {date} did not pass date validation")
+            return False
     
 def get_rides_from_df(df: pd.DataFrame) -> list[Ride]:
     rides = []

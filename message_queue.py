@@ -30,20 +30,11 @@ telegram_main_id = environment_handler.get_telegram_chat_id()
 class Message:
 
     def __init__(self):
-        self.dest_platform = None
         self.user = None
         self.chat = None
         self.message = None
         self.discord_chat_id = None
         self.telegram_chat_id = None
-
-
-
-    def set_dest_platform(self, platform: str) -> None:
-        if platform in ["telegram", "discord"]:
-            self.dest_platform = platform
-        else:
-            raise ValueError("Invalid platform. Must be 'telegram' or 'discord'.")
 
     def set_user(self, user: str) -> None:
         self.user = user
@@ -52,13 +43,7 @@ class Message:
     def set_message(self, message: str) -> None:
         self.message = message
 
-    def set_chat_id(self, dest_platform: str, chat_id: int) -> None:
-        if dest_platform not in ["telegram", "discord"]:
-            raise ValueError("Invalid platform. Must be 'telegram' or 'discord'.")
-
-        # convert the chat ID to the opposite platform's chat ID
-        # this code is fucked, but im too braindead to fix it right now. it sorta works?
-
+    def __get_id_map(self) -> dict:
         log_level = environment_handler.get_log_level()
         if log_level == logging.DEBUG:
             logger.debug("Using dev channel map")
@@ -67,36 +52,42 @@ class Message:
             logger.debug("Using prod channel map")
             id_map = data.chat_id_map
 
-        logger.debug(id_map)
+        return id_map
 
-        if dest_platform == "discord":
-            # Message is COMING FROM TELEGRAM
-            self.telegram_chat_id = chat_id
-            self.discord_chat_id = id_map["discord"].get(str(chat_id), None)
-            logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
-            logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
-        elif dest_platform == "telegram":
-            # Message is COMING FROM DISCORD
-            self.discord_chat_id = chat_id
-            self.telegram_chat_id = id_map["telegram"].get(str(chat_id), None)
-            logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
-            logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
+    def set_telegram_topic_id(self, chat_id: int) -> None:
+
+        id_map = self.__get_id_map()
+
+        self.discord_chat_id = id_map.get(str(chat_id), None)
+        self.telegram_chat_id = chat_id
+        logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
+        logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
+
+    def set_discord_topic_id(self, chat_id: int) -> None:
         
+        id_map = self.__get_id_map()
 
-    def get_dest_platform(self) -> Optional[str]:
-        return self.dest_platform
+        self.discord_chat_id = chat_id
+        self.telegram_chat_id = None
+
+        for key, value in id_map.items():
+            if value == chat_id:
+                self.telegram_chat_id = key
+                break
+
+        logger.debug(f"Set Discord chat ID: {self.discord_chat_id}")
+        logger.debug(f"Set Telegram chat ID: {self.telegram_chat_id}")
+        
     def get_user(self) -> Optional[str]:
         return self.user
     def get_chat(self) -> Optional[str]:
         return self.chat
     def get_message(self) -> Optional[str]:
         return self.message
-    def get_chat_id(self) -> Optional[int]:
-        if self.dest_platform == "telegram":
-            return self.telegram_chat_id
-        elif self.dest_platform == "discord":
-            return self.discord_chat_id
-        return None
+    def get_telegram_topic_id(self) -> Optional[int]:
+        return self.telegram_chat_id
+    def get_discord_topic_id(self) -> Optional[int]:
+        return self.discord_chat_id
     def get_discord_webhook(self):
         return environment_handler.get_discord_webhook(self.discord_chat_id)
 
@@ -113,8 +104,7 @@ class MessageQueue:
 
         messages_to_forward = []
         for message in self.queue:
-            if message.get_dest_platform() == platform:
-                messages_to_forward.append(message)
+            messages_to_forward.append(message)
 
         self.queue = [msg for msg in self.queue if msg not in messages_to_forward]
 
@@ -135,13 +125,16 @@ async def check_queue(context: ContextTypes.DEFAULT_TYPE):
     if messages:
         for message in messages:
             output = f"{message.get_user()}: {message.get_message()}"
-            await blind_send_message(
+            result = await blind_send_message(
                 chat_id=telegram_main_id,
                 message=output,
-                topic_id=message.get_chat_id(),
+                topic_id=message.get_telegram_topic_id(),
                 context=context,
             )
-            logger.debug(f"Forwarded message to Telegram: {output} from {message.get_user()} in chat {message.get_chat()} with ID {message.get_chat_id()}")
+            if not result:
+                logger.debug(f"Failed to forward message to Telegram: {output} from {message.get_user()} in chat {message.get_chat()} with ID {message.get_telegram_topic_id()}")
+            else:
+                logger.debug(f"Forwarded message to Telegram: {output} from {message.get_user()} in chat {message.get_chat()} with ID {message.get_telegram_topic_id()}")
     else:
         # logger.debug("No messages to forward to Telegram in the queue.")
         None

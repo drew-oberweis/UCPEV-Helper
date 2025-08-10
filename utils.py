@@ -73,11 +73,16 @@ class UpdateBundle:
         return await self.update.effective_message.reply_text(message)
 
 async def blind_send_message(chat_id: int, message: str, topic_id: int, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+    if(topic_id == None):
+        return False
+
     """Send a message to a chat without any context."""
     try:
         await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML, message_thread_id=topic_id)
     except Exception as e:
         raise Exception(f"Failed to send message to chat {chat_id}: {e}")
+    return True
 # This is a direct rip from https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py
 def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[tuple[bool, bool]]:
     """Takes a ChatMemberUpdated instance and extracts whether the 'old_chat_member' was a member
