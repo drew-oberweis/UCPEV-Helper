@@ -60,10 +60,9 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     # send message to discord using the correct webhook
     
     message = Message()
-    message.set_dest_platform("discord")
     message.set_user(username)
     message.set_message(update.effective_message.text)
-    message.set_chat_id("discord", topic_id)
+    message.set_telegram_topic_id(topic_id)
 
     webhook = message.get_discord_webhook()
     logger.debug(f"Webhook: {webhook}")
@@ -71,6 +70,6 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if webhook:
         utils.send_discord_webhook(webhook, update.effective_message.text, False, username)
     else:
-        logger.error(f"No webhook found for channel {message.get_chat_id()}. Cannot send message to Discord.")
+        logger.error(f"No webhook found for channel {message.get_telegram_topic_id()}. Cannot send message to Discord.")
 
     return do_nothing() # needed as a fake callback, otherwise it throws errors
