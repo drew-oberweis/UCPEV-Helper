@@ -10,8 +10,6 @@ logger = logging.getLogger(__name__)
 
 logger.info("Logging initialized.")
 
-global queue
-
 def main(q: MessageQueue = None):
 
     intents = discord.Intents.default()
@@ -35,10 +33,7 @@ def main(q: MessageQueue = None):
             logger.debug("Ignoring webhook message.")
             return
 
-        global queue
-        queue = q
-
-        if queue is None:
+        if q is None:
             logger.error("Message queue is not initialized.")
             return
 
