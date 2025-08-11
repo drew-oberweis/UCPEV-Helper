@@ -31,7 +31,10 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     ub = utils.UpdateBundle(update, context)
 
-    topic_id = ub.update.message.message_thread_id
+    try:
+        topic_id = ub.update.message.message_thread_id
+    except AttributeError:
+        return do_nothing()
 
     if topic_id == None:
         topic_id = 0
