@@ -21,7 +21,7 @@ import user_commands
 import admin_commands
 import data
 import environment_handler
-import custom_handlers as c_handlers
+import message_handler
 import utils
 import message_queue
 from utils import UpdateBundle
@@ -71,7 +71,8 @@ def main(queue=None):
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
 
     # Handling for message forwarding between platforms
-    app.add_handler(MessageHandler(filters.ALL ,c_handlers.on_message))
+    app.add_handler(MessageHandler(filters.ALL ,message_handler.on_message))
+
     # add loop to run ever n seconds to check the queue for messages to forward
     if queue is not None:
         logger.info("Setting up message queue checking...")
@@ -81,10 +82,7 @@ def main(queue=None):
 
     app.add_error_handler(error_handler)
 
-    command_list = utils.output_telegram_autocomplete()
-    # write the command list to a file
-    with open("commands.txt", "w") as f:
-        f.write(command_list)
+    utils.output_telegram_autocomplete()
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 

@@ -24,15 +24,12 @@ def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
     if(page == 1):
         logger.debug("Page 1 requested, returning routes")
         output = pd.read_csv(routes_url)
-        # logger.debug(f"Routes data: {output.head()}")
     elif(page == 2):
         logger.debug("Page 2 requested, returning rides")
         output = pd.read_csv(rides_url)
-        # logger.debug(f"Rides data: {output.head()}")
     elif(page == 3):
         logger.debug("Page 3 requested, returning cleaned rides")
         output = pd.read_csv(cleaned_url)
-        # logger.debug(f"Cleaned rides data: {output.head()}")
     elif(page == None):
         # Return all sheets as a dictionary
         logger.debug("No page requested, returning all sheets")
@@ -41,11 +38,7 @@ def __pull_sheets(page=None): # 1-3 is valid, if page is none, return all pages
             'rides': pd.read_csv(rides_url),
             'cleaned': pd.read_csv(cleaned_url)
         }
-        # logger.debug(f"All sheets data: {output}")
-
     # print column names for debugging
-    debug_print = output.columns.tolist()
-    logger.debug(f"COLUMNS: {debug_print}")
 
     return output
 

@@ -126,10 +126,13 @@ def output_telegram_autocomplete():
     for i in data.admin_command_descriptions:
         output += f"{i} - {data.admin_command_descriptions[i]} (Admin only)\n"
 
+    with open("commands.txt", "w") as f:
+        f.write(output)
+
     logger.log(logging.INFO, f"\nThe following output was generated to update the autocomplete list: \n\n{output}-----------------------\nIt has also been saved to commands.txt\n")
     return output
 
-async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE): # can't be UpdateBundle because it needs to match the default params of TPB callbacks
     if(update.effective_chat.type == "private"):
         return False
 
