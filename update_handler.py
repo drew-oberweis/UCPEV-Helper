@@ -54,6 +54,15 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     logger.debug(f"Received message from {username} ({user.id}) in chat {topic_id}: {update.effective_message.text}")
     
+    announcement_topic = data.announcement_topic_dev if environment_handler.get_log_level() == logging.DEBUG else data.announcement_topic_prod
+    if update.effective_message.message_thread_id == announcement_topic:
+        is_admin = await utils.is_admin(update, context)
+        if is_admin:
+            pass
+        else:
+            # delete message as user is not an admin
+            await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.effective_message.id)
+
     # send message to discord using the correct webhook
 
     msg_text = update.effective_message.text
