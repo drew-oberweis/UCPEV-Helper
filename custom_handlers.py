@@ -58,17 +58,26 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     logger.debug(f"Received message from {username} ({user.id}) in chat {topic_id}: {update.effective_message.text}")
     
     # send message to discord using the correct webhook
-    
-    message = Message()
+
+    msg_text = update.effective_message.text
+    logger.debug(f"Message text: [{msg_text}]")
+
+    if msg_text == "" or msg_text == None:
+        # check caption for text, it is put there if message is a photo
+        logger.debug(f"No text found in message, using caption: {update.effective_message.caption}")
+        msg_text = update.effective_message.caption
+
+    logger.debug(f"Message text after caption check: [{msg_text}]")
+
+    message = Message() # build into object for validation
     message.set_user(username)
-    message.set_message(update.effective_message.text)
+    message.set_message(msg_text)
     message.set_telegram_topic_id(topic_id)
 
     webhook = message.get_discord_webhook()
-    logger.debug(f"Webhook: {webhook}")
 
     if webhook:
-        utils.send_discord_webhook(webhook, update.effective_message.text, False, username)
+        utils.send_discord_webhook(webhook, message.get_message(), False, message.get_user())
     else:
         logger.error(f"No webhook found for channel {message.get_telegram_topic_id()}. Cannot send message to Discord.")
 
