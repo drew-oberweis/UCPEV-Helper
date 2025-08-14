@@ -20,7 +20,8 @@ import data
 import environment_handler
 import utils
 from message_queue import Message
-from location import LocPoint
+from location import LocPoint, LocTracker
+import scheduled
 
 logger = logging.getLogger(__name__)
 token = environment_handler.get_telegram_token()
@@ -95,10 +96,12 @@ async def location_message_handler(update: Update, context: ContextTypes.DEFAULT
     ub = utils.UpdateBundle(update, context)
     loc_obj = update.effective_message.location
 
-    lat = loc_obj.latitude
-    long = loc_obj.longitude
+    # check if location is a live location, just a one-off. Ignore if one-off
+    if not loc_obj.live_period:
+        logger.debug("Received a one-off location, ignoring.")
+        return do_nothing()
 
-    location = LocPoint(latitude=lat, longitude=long)
-    location.set_user(ub.get_user().id)
+    tracker = LocTracker(loc_obj)
+    scheduled.tracked_locations.append(tracker)
 
-    logger.debug(f"Received location: {location}")
+    logger.debug(f"Received location: {loc_obj}")

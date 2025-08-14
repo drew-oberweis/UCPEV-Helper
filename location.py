@@ -1,3 +1,9 @@
+from telegram import Location
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 class LocPoint:
 
     def __init__(self, latitude: float, longitude: float, speed: int = 0):
