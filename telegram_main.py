@@ -69,8 +69,8 @@ def main(queue=None):
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-
-    # Handling for message forwarding between platforms
+    app.add_handler(MessageHandler(filters.LOCATION, message_handler.location_message_handler))
+    
     app.add_handler(MessageHandler(filters.ALL ,message_handler.on_message))
 
     # add loop to run ever n seconds to check the queue for messages to forward

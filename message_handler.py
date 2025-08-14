@@ -20,6 +20,7 @@ import data
 import environment_handler
 import utils
 from message_queue import Message
+from location import LocPoint
 
 logger = logging.getLogger(__name__)
 token = environment_handler.get_telegram_token()
@@ -72,6 +73,10 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     logger.debug(f"Message text after caption check: [{msg_text}]")
 
+    if msg_text == None or msg_text == "":
+        logger.debug("No message text found, skipping sending to Discord.")
+        return do_nothing()
+
     message = Message() # build into object for validation
     message.set_user(username)
     message.set_message(msg_text)
@@ -85,3 +90,15 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         logger.error(f"No webhook found for channel {message.get_telegram_topic_id()}. Cannot send message to Discord.")
 
     return do_nothing() # needed as a fake callback, otherwise it throws errors
+
+async def location_message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    ub = utils.UpdateBundle(update, context)
+    loc_obj = update.effective_message.location
+
+    lat = loc_obj.latitude
+    long = loc_obj.longitude
+
+    location = LocPoint(latitude=lat, longitude=long)
+    location.set_user(ub.get_user().id)
+
+    logger.debug(f"Received location: {location}")
