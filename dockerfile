@@ -16,6 +16,7 @@ ADD discord_main.py /app
 ADD telegram_main.py /app
 ADD message_queue.py /app
 ADD location.py /app
+ADD scheduled.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs
