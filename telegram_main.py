@@ -21,7 +21,7 @@ import user_commands
 import admin_commands
 import data
 import environment_handler
-import message_handler
+import update_handler
 import utils
 import message_queue
 from utils import UpdateBundle
@@ -70,9 +70,9 @@ def main(queue=None):
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
-    app.add_handler(MessageHandler(filters.LOCATION, message_handler.location_message_handler))
+    app.add_handler(MessageHandler(filters.LOCATION, update_handler.location_message_handler))
 
-    app.add_handler(MessageHandler(filters.ALL ,message_handler.on_message))
+    app.add_handler(MessageHandler(filters.ALL ,update_handler.on_message))
 
     # add loop to run ever n seconds to check the queue for messages to forward
     if queue is not None:
