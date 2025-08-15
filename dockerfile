@@ -8,7 +8,7 @@ ADD user_commands.py /app
 ADD utils.py /app
 ADD data.py /app
 ADD environment_handler.py /app
-ADD message_handler.py /app
+ADD update_handler.py /app
 ADD ride.py /app
 ADD route.py /app
 ADD sheets_interface.py /app

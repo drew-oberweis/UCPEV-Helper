@@ -1,17 +1,11 @@
 import logging
-import time
-import os
-import sys
+from datetime import datetime
 
 from telegram import (
     Update,
 )
 from telegram.ext import (
-    Application,
-    CommandHandler,
     ContextTypes,
-    MessageHandler,
-    ChatMemberHandler,
 )
 
 import data
@@ -19,7 +13,6 @@ import environment_handler
 import utils
 from message_queue import Message
 from location import LocPoint
-import scheduled
 import db
 
 logger = logging.getLogger(__name__)
@@ -106,19 +99,24 @@ async def location_message_handler(update: Update, context: ContextTypes.DEFAULT
     loc_point = LocPoint(
         latitude=loc_obj.latitude,
         longitude=loc_obj.longitude,
-        timestamp=loc_obj.timestamp
+        timestamp=datetime.now().timestamp(), # use current time
     )
 
     # Set user and timestamp
     loc_point.set_user(ub.get_user().username)
+    loc_point.set_heading(loc_obj.heading if hasattr(loc_obj, 'heading') else None)
 
     # Insert location point into the database
-    db.insert_location_point(
+
+    session = db.Session()
+
+    session.insert_location_point(
         latitude=loc_point.get_lat(),
         longitude=loc_point.get_lon(),
         speed=loc_point.get_speed(),
-        user_id=loc_point.get_user(),
-        timestamp=loc_point.get_timestamp()
+        user_id=ub.get_user().id,
+        timestamp=loc_point.get_timestamp(),
+        heading=loc_point.get_heading()
     )
 
     return do_nothing()

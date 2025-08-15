@@ -11,23 +11,26 @@ tables = {
         {"name": "latitude", "type": "FLOAT"},
         {"name": "longitude", "type": "FLOAT"},
         {"name": "speed", "type": "INTEGER"},
-        {"name": "user_id", "type": "INTEGER"},
-        {"name": "timestamp", "type": "TIMESTAMP"}
+        {"name": "user_id", "type": "VARCHAR(255)"},
+        {"name": "timestamp", "type": "INTEGER"},
+        {"name": "heading", "type": "INTEGER"},
     ]
 }
 
 class Session:
     def __init__(self):
-        self.name, self.user, self.password, self.host, self.port, self.database = environment_handler.get_database_config()
+        self.name, self.user, self.password, self.host, self.port, = environment_handler.get_database_config()
 
         self.connection = psycopg2.connect(
-            dbname=self.database,
+            dbname=self.name,
             user=self.user,
             password=self.password,
             host=self.host,
             port=self.port
         )
         self.cursor = self.connection.cursor()
+
+        self.create_tables()
 
     def close(self):
         if self.cursor:
@@ -65,10 +68,10 @@ class Session:
             logger.error(f"Error executing query: {e}")
             self.connection.rollback()
 
-    def insert_location_point(self, latitude, longitude, speed, user_id, timestamp):
+    def insert_location_point(self, latitude, longitude, speed, user_id, timestamp, heading):
         query = """
-        INSERT INTO location_points (latitude, longitude, speed, user_id, timestamp)
-        VALUES (%s, %s, %s, %s, %s);
+        INSERT INTO location_points (latitude, longitude, speed, user_id, timestamp, heading)
+        VALUES (%s, %s, %s, %s, %s, %s);
         """
-        params = (latitude, longitude, speed, user_id, timestamp)
+        params = (latitude, longitude, speed, user_id, timestamp, heading)
         self.execute_query(query, params)

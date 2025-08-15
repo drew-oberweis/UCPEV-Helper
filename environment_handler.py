@@ -76,8 +76,7 @@ def get_database_config():
         password = os.environ['db_password']
         host = os.environ['db_host']
         port = os.environ['db_port']
-        database = os.environ['db_database']
     except KeyError as e:
         logger.error(f"Database configuration error: {e}")
         return None
-    return name, user, password, host, port, database
+    return name, user, password, host, port

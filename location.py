@@ -6,12 +6,13 @@ logger = logging.getLogger(__name__)
 
 class LocPoint:
 
-    def __init__(self, latitude: float, longitude: float, speed: int = 0):
+    def __init__(self, latitude: float, longitude: float, timestamp: float):
         self.latitude = latitude
         self.longitude = longitude
-        self.speed = speed
         self.user = None
-        self.timestamp = None
+        self.timestamp = timestamp
+        self.speed = 0
+        self.heading = None
 
     def __repr__(self) -> str:
         return f"LocPoint(latitude={self.latitude}, longitude={self.longitude}, speed={self.speed})"
@@ -36,6 +37,9 @@ class LocPoint:
     def set_timestamp(self, timestamp: float) -> None:
         self.timestamp = timestamp
 
+    def set_heading(self, heading: int) -> None:
+        self.heading = heading
+
     def get_lat(self) -> float:
         return self.latitude
 
@@ -50,3 +54,6 @@ class LocPoint:
 
     def get_timestamp(self) -> float:
         return self.timestamp
+
+    def get_heading(self) -> int:
+        return self.heading
