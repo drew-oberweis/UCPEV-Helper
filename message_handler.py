@@ -14,14 +14,13 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
-import user_commands
-import admin_commands
 import data
 import environment_handler
 import utils
 from message_queue import Message
-from location import LocPoint, LocTracker
+from location import LocPoint
 import scheduled
+import db
 
 logger = logging.getLogger(__name__)
 token = environment_handler.get_telegram_token()
@@ -101,7 +100,25 @@ async def location_message_handler(update: Update, context: ContextTypes.DEFAULT
         logger.debug("Received a one-off location, ignoring.")
         return do_nothing()
 
-    tracker = LocTracker(loc_obj)
-    scheduled.tracked_locations.append(tracker)
-
     logger.debug(f"Received location: {loc_obj}")
+
+    # Create a new location point object
+    loc_point = LocPoint(
+        latitude=loc_obj.latitude,
+        longitude=loc_obj.longitude,
+        timestamp=loc_obj.timestamp
+    )
+
+    # Set user and timestamp
+    loc_point.set_user(ub.get_user().username)
+
+    # Insert location point into the database
+    db.insert_location_point(
+        latitude=loc_point.get_lat(),
+        longitude=loc_point.get_lon(),
+        speed=loc_point.get_speed(),
+        user_id=loc_point.get_user(),
+        timestamp=loc_point.get_timestamp()
+    )
+
+    return do_nothing()

@@ -4,3 +4,4 @@ python-dotenv
 discord-webhook
 discord
 pandas
+psycopg2

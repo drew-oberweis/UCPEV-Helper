@@ -17,6 +17,7 @@ ADD telegram_main.py /app
 ADD message_queue.py /app
 ADD location.py /app
 ADD scheduled.py /app
+ADD db.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs

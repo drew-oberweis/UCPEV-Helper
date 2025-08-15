@@ -11,6 +11,7 @@ class LocPoint:
         self.longitude = longitude
         self.speed = speed
         self.user = None
+        self.timestamp = None
 
     def __repr__(self) -> str:
         return f"LocPoint(latitude={self.latitude}, longitude={self.longitude}, speed={self.speed})"
@@ -32,6 +33,9 @@ class LocPoint:
     def set_user(self, user: str) -> None:
         self.user = user
 
+    def set_timestamp(self, timestamp: float) -> None:
+        self.timestamp = timestamp
+
     def get_lat(self) -> float:
         return self.latitude
 
@@ -43,8 +47,6 @@ class LocPoint:
 
     def get_user(self) -> str:
         return self.user
-    def get_speed(self) -> int:
-        return self.speed
 
-    def get_user(self) -> str:
-        return self.user
+    def get_timestamp(self) -> float:
+        return self.timestamp
