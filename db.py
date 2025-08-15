@@ -10,10 +10,10 @@ tables = {
     "location_points": [
         {"name": "latitude", "type": "FLOAT"},
         {"name": "longitude", "type": "FLOAT"},
-        {"name": "speed", "type": "INTEGER"},
         {"name": "user_id", "type": "VARCHAR(255)"},
         {"name": "timestamp", "type": "INTEGER"},
         {"name": "heading", "type": "INTEGER"},
+        {"name": "source_message_id", "type": "VARCHAR(255)"}
     ]
 }
 
@@ -68,10 +68,10 @@ class Session:
             logger.error(f"Error executing query: {e}")
             self.connection.rollback()
 
-    def insert_location_point(self, latitude, longitude, speed, user_id, timestamp, heading):
+    def insert_location_point(self, latitude, longitude, user_id, timestamp, heading, source_message_id):
         query = """
-        INSERT INTO location_points (latitude, longitude, speed, user_id, timestamp, heading)
+        INSERT INTO location_points (latitude, longitude, user_id, timestamp, heading, source_message_id)
         VALUES (%s, %s, %s, %s, %s, %s);
         """
-        params = (latitude, longitude, speed, user_id, timestamp, heading)
+        params = (latitude, longitude, user_id, timestamp, heading, source_message_id)
         self.execute_query(query, params)

@@ -113,10 +113,10 @@ async def location_message_handler(update: Update, context: ContextTypes.DEFAULT
     session.insert_location_point(
         latitude=loc_point.get_lat(),
         longitude=loc_point.get_lon(),
-        speed=loc_point.get_speed(),
         user_id=ub.get_user().id,
         timestamp=loc_point.get_timestamp(),
-        heading=loc_point.get_heading()
+        heading=loc_point.get_heading(),
+        source_message_id=update.effective_message.message_id
     )
 
     return do_nothing()
