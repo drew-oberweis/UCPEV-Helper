@@ -102,7 +102,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for i in commands: # TODO: Make this filter by what the user can actually do
         help_msg += f"/{i} - {command_descriptions[i]}\n"
 
-    is_admin = await utils.is_admin(update.effective_user)
+    is_admin = await utils.is_admin(update, context)
 
     if is_admin:
         help_msg += "\n\nAdmin commands:\n"
