@@ -23,6 +23,15 @@ def get_discord_token():
         token = None
     return token
 
+def get_discord_announcement_webhook() -> str:
+    load_dotenv()
+    try:
+        webhook = os.environ['discord_announcement_webhook']
+    except KeyError:
+        logger.error("Discord announcement webhook not found in environment variables.")
+        webhook = None
+    return webhook
+
 def get_discord_webhook(channel: str) -> str:
     load_dotenv()
 
@@ -67,3 +76,16 @@ def get_log_level():
     else:
         logger.warning("Invalid log level or no log level present in environment variables. Defaulting to INFO.")
         return logging.INFO # info should be default
+
+def get_database_config():
+    load_dotenv()
+    try:
+        name = os.environ['db_name']
+        user = os.environ['db_user']
+        password = os.environ['db_password']
+        host = os.environ['db_host']
+        port = os.environ['db_port']
+    except KeyError as e:
+        logger.error(f"Database configuration error: {e}")
+        return None
+    return name, user, password, host, port

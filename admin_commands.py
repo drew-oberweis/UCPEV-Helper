@@ -73,50 +73,13 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
 
     try:
-        ride_inf = shit.get_upcoming_rides()[0]
+        ride = shit.get_upcoming_rides()[0]
     except IndexError as e:
         await ub.send_message("There are no rides scheduled")
         return
 
-    organizer = ride_inf[0]
-    name = ride_inf[1]
-    date = ride_inf[2]
-    time = ride_inf[3]
-    route = ride_inf[4]
-    pace = ride_inf[5]
-    extra = ride_inf[6]
+    message = utils.generate_ride_text(ride)
 
-    route_inf = shit.get_route(route)
-
-    start_loc = route_inf[1]
-    start_pin = route_inf[2]
-    notable_loc = route_inf[3]
-    end_loc = route_inf[4]
-    end_pin = route_inf[5]
-    dist = route_inf[6]
-    gaia_link = route_inf[7]
-    route_desc = route_inf[8]
-    route_extra = route_inf[9]
-
-    if extra != "":
-        extra = f"\n\n{extra}"
-
-    ride_message = f"{name}\nOrganizer: {organizer}\n\nDate/Time: {date} @ {time}\nPace: {pace}{extra}"
-    
-    if start_pin == "":
-        start_msg = f"Start Location: {start_loc}"
-    else:
-        start_msg = f"Start Location: {start_loc} ({start_pin})"
-
-    if end_pin == "":
-        end_msg = f"End Location: {end_loc}"
-    else:
-        end_msg = f"End Location: {end_loc} ({end_pin})"
-
-    route_message = f"Route Name: {route}\n{start_msg}\n{end_msg}\nPOI: {notable_loc}\nDistance: {dist} miles\nGAIA Link: {gaia_link}\n\nRoute Description: {route_desc}\n\n{route_extra}"
-
-    message = ride_message + "\n\n" + route_message
-    
     """
     Default poll:
         Be there
@@ -131,9 +94,8 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         Maybe
     """
 
-    # generate poll expiration, midnight of the day of the ride
-    ride_date_timestamp = datetime.strptime(date, "%m/%d/%Y").timestamp()
-    poll_expiration = ride_date_timestamp + 86400
+    # generate poll expiration, 12 hours after message sent
+    poll_expiration = datetime.now().timestamp() + 43200
 
     # Delete the command message
     await context.bot.delete_message(update.effective_chat.id, update.message.message_id) #TODO: implement this using UpdateBundle
@@ -148,5 +110,5 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # send poll
     await context.bot.send_poll(update.effective_chat.id, question=poll_message, options=poll_options, is_anonymous=False, allows_multiple_answers=False, message_thread_id=update.effective_message.message_thread_id)
 
-    webhook_url = environment_handler.get_discord_webhook()
+    webhook_url = environment_handler.get_discord_announcement_webhook()
     utils.send_discord_webhook(webhook_url, "Ride poll posted in Telegram! Head over there to check it out!", True)

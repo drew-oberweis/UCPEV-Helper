@@ -53,7 +53,7 @@ def get_upcoming_rides() -> list[ride.Ride]:
         
     return rides
 
-def get_route(name) -> pd.DataFrame:
+def get_route(name) -> route.Route:
     
     routes_df = __pull_sheets(1) # 1 is routes
     routes = route.get_routes_from_df(routes_df)

@@ -28,6 +28,8 @@ from discord_webhook import DiscordWebhook
 import data
 import environment_handler
 from data import chat_id_map
+from ride import Ride
+import sheets_interface as shit
 
 token = environment_handler.get_telegram_token()
 
@@ -150,3 +152,27 @@ async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE): # can't 
         logger.error(f"Error getting chat admins: {e}")
         return False
     return is_admin
+
+def generate_ride_text(ride: Ride) -> str:
+    # get the route of the selected ride
+    route = shit.get_route(ride.route)
+    if not route:
+        return "Route not found"
+
+    logger.debug(route)
+
+    extra = ride.description # pulled to enable cleaning up of rides with no description
+
+    if extra != "": # line breaks are separate to avoid adding 2 extra blank lines to the message
+        extra = f"\n\n{extra}"
+
+    ride_message = f"{ride.name}\nOrganizer: {ride.organizer}\n\nDate/Time: {ride.nice_date()} @ {ride.time}\nPace: {ride.pace}{extra}"
+    
+    route_message = f"{route}" # force casting
+
+    if route_message == "":
+        message = ride_message
+    else:
+        message = ride_message + "\n\n" + route_message
+
+    return message
