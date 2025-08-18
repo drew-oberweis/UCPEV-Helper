@@ -77,5 +77,5 @@ chat_id_map = { # This is really, REALLY stupid that I have it going both ways b
     "3": 1402431253067726979
 }
 
-announcement_topic_dev = 1201
-announcement_topic_prod = None
+announcement_topic_dev = 1201 #why the fuck did i put this here, TODO: Move this to a config file
+announcement_topic_prod = 21775
