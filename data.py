@@ -76,3 +76,6 @@ chat_id_map = { # This is really, REALLY stupid that I have it going both ways b
     "15631": 1402431104396431501,
     "3": 1402431253067726979
 }
+
+announcement_topic_dev = 1201
+announcement_topic_prod = None
