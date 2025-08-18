@@ -22,7 +22,7 @@ admin_command_descriptions = {
     "send_topic_id": "Sends the topic ID of the current topic (for admin use only)",
 }
 
-emergency_contact_form_url = "https://forms.gle/ZooQHi9JM5Jj2Jba7"
+emergency_contact_form_url = "https://forms.gle/ZooQHi9JM5Jj2Jba7" # ALSO UPDATE IN LINKS WHEN CHANGED
 
 responses = { # Eventually, this will all be pulled from a database editable on the website. For now, it's hardcoded. Because I am lazy.
     "welcome": "Welcome to UIUC PEV! Do /rules to check the rules of the group, and /help to see other commands!",
@@ -44,7 +44,7 @@ responses = { # Eventually, this will all be pulled from a database editable on 
         "Have fun!"
     ],
     "nosedive": "<a href='https://www.youtube.com/watch?v=kc6IEVV9mp0'>ayy lmao</a>", # stolen directly from ChiPEV
-    "links": "All of our links can be found <a href='https://linktr.ee/UIUCPEV'>here</a>",
+    "links": "All of our links can be found <a href='https://linktr.ee/UIUCPEV'>here</a>\n\nPlease also fill out our emergency contact form <a href='https://forms.gle/ZooQHi9JM5Jj2Jba7'>here</a>",
     "codes": "Discount codes are stolen from ChiPEV, and can be found <a href='https://docs.google.com/spreadsheets/d/1QTMuWO8k5719MeBt535rA_kPvSEVmiTI3wVA9Bcwu5g/edit?usp=sharing'>here</a>",
     "helmet": """<a href='https://www.youtube.com/watch?v=b9yL5usLFgY'>I LOVE HELMETS</a>\n
             Make sure you wear a good helmet!\n
