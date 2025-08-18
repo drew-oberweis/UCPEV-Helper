@@ -62,6 +62,8 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         else:
             # delete message as user is not an admin
             await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.effective_message.id)
+            logger.info(f"User {username} tried to send a message to the announcement channel {announcement_topic} but is not an admin. Message deleted.")
+            return
 
     # send message to discord using the correct webhook
 
