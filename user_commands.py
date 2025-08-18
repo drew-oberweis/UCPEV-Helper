@@ -129,26 +129,6 @@ async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await ub.send_message("There are no scheduled rides.")
         return
 
-    # get the route of the selected ride
-    route = shit.get_route(ride.route)
-    if not route:
-        await ub.send_message("Route not found.")
-        return
-
-    logger.debug(route)
-
-    extra = ride.description # pulled to enable cleaning up of rides with no description
-
-    if extra != "": # line breaks are separate to avoid adding 2 extra blank lines to the message
-        extra = f"\n\n{extra}"
-
-    ride_message = f"{ride.name}\nOrganizer: {ride.organizer}\n\nDate/Time: {ride.nice_date()} @ {ride.time}\nPace: {ride.pace}{extra}"
-    
-    route_message = f"{route}" # force casting
-
-    if route_message == "":
-        message = ride_message
-    else:
-        message = ride_message + "\n\n" + route_message
+    message = utils.generate_ride_text(ride)
 
     await ub.send_message(message)

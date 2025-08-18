@@ -23,6 +23,15 @@ def get_discord_token():
         token = None
     return token
 
+def get_discord_announcement_webhook() -> str:
+    load_dotenv()
+    try:
+        webhook = os.environ['discord_announcement_webhook']
+    except KeyError:
+        logger.error("Discord announcement webhook not found in environment variables.")
+        webhook = None
+    return webhook
+
 def get_discord_webhook(channel: str) -> str:
     load_dotenv()
 
