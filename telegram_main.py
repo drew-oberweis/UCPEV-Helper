@@ -21,10 +21,11 @@ import user_commands
 import admin_commands
 import data
 import environment_handler
-import message_handler
+import update_handler
 import utils
 import message_queue
 from utils import UpdateBundle
+import scheduled
 
 logger = logging.getLogger(__name__)
 
@@ -69,14 +70,14 @@ def main(queue=None):
         app.add_handler(CommandHandler(i, admin_commands_map[i]))
 
     app.add_handler(ChatMemberHandler(user_commands.welcome, ChatMemberHandler.CHAT_MEMBER))
+    app.add_handler(MessageHandler(filters.LOCATION, update_handler.location_message_handler))
 
-    # Handling for message forwarding between platforms
-    app.add_handler(MessageHandler(filters.ALL ,message_handler.on_message))
+    app.add_handler(MessageHandler(filters.ALL ,update_handler.on_message))
 
     # add loop to run ever n seconds to check the queue for messages to forward
     if queue is not None:
         logger.info("Setting up message queue checking...")
-        app.job_queue.run_repeating(message_queue.check_queue, interval=1, first=0, data=queue)
+        app.job_queue.run_repeating(scheduled.check_queue, interval=1, first=0, data=queue)
     else:
         logger.warning("No message queue provided, this instance will not support message forwarding between platforms.")
 
