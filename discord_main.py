@@ -44,6 +44,6 @@ def main(q: MessageQueue = None):
         msg_obj.set_chat(str(message.channel))
         msg_obj.set_message(message.content)
         msg_obj.set_discord_topic_id(message.channel.id)
-        queue.add_message(msg_obj)
+        q.add_message(msg_obj)
 
     client.run(environment_handler.get_discord_token())
