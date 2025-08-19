@@ -35,6 +35,9 @@ async def check_queue(context: ContextTypes.DEFAULT_TYPE):
     q = context.job.data
 
     messages = q.get_queue("telegram")
+
+    telegram_main_id = environment_handler.get_telegram_chat_id()
+
     if messages:
         for message in messages:
             output = f"{message.get_user()}: {message.get_message()}"

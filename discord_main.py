@@ -39,14 +39,11 @@ def main(q: MessageQueue = None):
 
         logger.debug(f"Received message: {message.content} from {message.author.display_name} ({message.author.id}) in channel {message.channel}")
 
-        if message.content.startswith("!hello"):
-            await message.channel.send("Hello! I'm a bot.")
-
         msg_obj = Message()
         msg_obj.set_user(str(message.author.display_name))
         msg_obj.set_chat(str(message.channel))
         msg_obj.set_message(message.content)
         msg_obj.set_discord_topic_id(message.channel.id)
-        queue.add_message(msg_obj)
+        q.add_message(msg_obj)
 
     client.run(environment_handler.get_discord_token())
