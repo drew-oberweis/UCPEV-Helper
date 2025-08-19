@@ -39,9 +39,6 @@ def main(q: MessageQueue = None):
 
         logger.debug(f"Received message: {message.content} from {message.author.display_name} ({message.author.id}) in channel {message.channel}")
 
-        if message.content.startswith("!hello"):
-            await message.channel.send("Hello! I'm a bot.")
-
         msg_obj = Message()
         msg_obj.set_user(str(message.author.display_name))
         msg_obj.set_chat(str(message.channel))
