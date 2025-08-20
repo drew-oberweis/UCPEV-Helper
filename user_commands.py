@@ -1,20 +1,13 @@
 import logging
 import utils
-import os
-import datetime
 
 from telegram import (
-    Update
+    Update,
 )
 from telegram.ext import (
-    Application,
-    CommandHandler,
     ContextTypes,
-    MessageHandler,
 )
-from telegram.constants import ParseMode
 import data
-import ride
 from utils import UpdateBundle
 import sheets_interface as shit
 

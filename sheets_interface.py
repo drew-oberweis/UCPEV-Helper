@@ -1,4 +1,3 @@
-import os.path
 import logging
 
 import pandas as pd

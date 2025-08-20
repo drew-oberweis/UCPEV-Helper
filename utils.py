@@ -1,17 +1,11 @@
 import logging
 from typing import Optional
-import os
-import zipfile
-import shutil
-
 from telegram import (
     Update,
     User,
     Chat,
     ChatMember,
     ChatMemberUpdated,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup
 )
 from telegram.ext import (
     ContextTypes,

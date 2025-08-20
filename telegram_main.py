@@ -1,8 +1,4 @@
 import logging
-import time
-import os
-import sys
-import asyncio
 
 from telegram import (
     Update
@@ -14,16 +10,13 @@ from telegram.ext import (
     MessageHandler,
     ChatMemberHandler,
     filters,
-    ConversationHandler
 )
 
 import user_commands
 import admin_commands
-import data
 import environment_handler
 import update_handler
 import utils
-import message_queue
 from utils import UpdateBundle
 import scheduled
 import task_schedulers
