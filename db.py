@@ -1,5 +1,4 @@
 import psycopg2
-from datetime import datetime
 import logging
 
 import environment_handler

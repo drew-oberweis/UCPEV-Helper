@@ -1,4 +1,3 @@
-from telegram import Location
 import logging
 
 

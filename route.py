@@ -56,34 +56,24 @@ class Route:
     #TODO: Add verifiers for relevant fields here
     def set_name(self, name: str):
         self.name = name
-        logger.debug(f"Route name set to: {self.name}")
     def set_start_location(self, start_location: str):
         self.start_location = start_location
-        logger.debug(f"Start location set to: {self.start_location}")
     def set_start_pin(self, start_pin: str):
         self.start_pin = start_pin
-        logger.debug(f"Start pin set to: {self.start_pin}")
     def set_notable_location(self, notable_location: str):
         self.notable_location = notable_location
-        logger.debug(f"Notable location set to: {self.notable_location}")
     def set_end_location(self, end_location: str):
         self.end_location = end_location
-        logger.debug(f"End location set to: {self.end_location}")
     def set_end_pin(self, end_pin: str):
         self.end_pin = end_pin
-        logger.debug(f"End pin set to: {self.end_pin}")
     def set_est_distance(self, est_distance: str):
         self.est_distance = est_distance
-        logger.debug(f"Estimated distance set to: {self.est_distance}")
     def set_gaia_link(self, gaia_link: str):
         self.gaia_link = gaia_link
-        logger.debug(f"GAIA link set to: {self.gaia_link}")
     def set_route_description(self, route_description: str):
         self.route_description = route_description
-        logger.debug(f"Route description set to: {self.route_description}")
     def set_extra(self, extra: str):
         self.extra = extra
-        logger.debug(f"Extra information set to: {self.extra}")
 
 
 def get_routes_from_df(routes_df: pd.DataFrame) -> list[Route]:

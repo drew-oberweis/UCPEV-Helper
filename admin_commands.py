@@ -3,24 +3,15 @@ from datetime import datetime
 
 from telegram import (
     Update,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
 )
 from telegram.ext import (
-    Application,
-    CommandHandler,
     ContextTypes,
-    MessageHandler,
-    ConversationHandler,
-    filters
 )
 from telegram.constants import ParseMode
-import data
 import utils
 import environment_handler
 from utils import UpdateBundle
 import sheets_interface as shit
-from ride import Ride
 
 logger = logging.getLogger(__name__)
 token = environment_handler.get_telegram_token()
@@ -51,7 +42,7 @@ async def announce(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) == 0:
         await ub.send_message("Please provide a message to announce.")
         return
-    message = f"Announcement from {ub.update.effective_user}:\n\n".join(context.args)
+    message = f"Announcement from {ub.update.effective_user}:\n\n".join(args)
     message = await ub.send_message(message)
 
     await message.pin()

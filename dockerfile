@@ -18,6 +18,7 @@ ADD message_queue.py /app
 ADD location.py /app
 ADD scheduled.py /app
 ADD db.py /app
+ADD task_schedulers.py /app
 
 WORKDIR /app
 RUN mkdir /app/logs
