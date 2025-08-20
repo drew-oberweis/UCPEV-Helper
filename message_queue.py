@@ -4,25 +4,6 @@ import data
 from utils import blind_send_message
 import environment_handler
 
-from telegram import (
-    Update,
-    User,
-    Chat,
-    ChatMember,
-    ChatMemberUpdated,
-)
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    ChatMemberHandler,
-)
-
-from telegram.constants import (
-    ParseMode,
-)
-
 logger = logging.getLogger(__name__)
 
 telegram_main_id = environment_handler.get_telegram_chat_id()

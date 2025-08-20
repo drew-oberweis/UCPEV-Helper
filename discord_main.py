@@ -1,7 +1,5 @@
 import discord
 import logging
-import time
-import sys
 
 import environment_handler
 from message_queue import MessageQueue, Message
