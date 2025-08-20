@@ -10,14 +10,10 @@ from telegram import (
     Chat,
     ChatMember,
     ChatMemberUpdated,
-    UserProfilePhotos
+    InlineKeyboardButton,
 )
 from telegram.ext import (
-    Application,
-    CommandHandler,
     ContextTypes,
-    MessageHandler,
-    ChatMemberHandler,
 )
 
 from telegram.constants import (
