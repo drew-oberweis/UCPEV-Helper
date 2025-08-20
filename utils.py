@@ -11,6 +11,7 @@ from telegram import (
     ChatMember,
     ChatMemberUpdated,
     InlineKeyboardButton,
+    InlineKeyboardMarkup
 )
 from telegram.ext import (
     ContextTypes,
@@ -61,14 +62,19 @@ class UpdateBundle:
             context = self.get_context()
             update = self.get_update()
             logger.log(logging.DEBUG, f"Chat ID: {update.effective_chat.id}")
-            message = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
-            return message
+            response = await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
+            return response
         except Exception as e:
-            message = await context.bot.send_message(chat_id=update.effective_chat.id, text="Error: " + str(e), parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
-            return message
-    
+            response = await context.bot.send_message(chat_id=update.effective_chat.id, text="Error: " + str(e), parse_mode=ParseMode.HTML, message_thread_id=update.effective_message.message_thread_id)
+            return response
+
     async def send_reply(self, message: str):
         return await self.update.effective_message.reply_text(message)
+    
+    async def delete_message(self):
+        context = self.get_context()
+        update = self.get_update()
+        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.effective_message.message_id)
 
 async def blind_send_message(chat_id: int, message: str, topic_id: int, context: ContextTypes.DEFAULT_TYPE) -> None:
 
@@ -172,3 +178,13 @@ def generate_ride_text(ride: Ride) -> str:
         message = ride_message + "\n\n" + route_message
 
     return message
+
+async def scheduled_delete_message(context: ContextTypes.DEFAULT_TYPE):
+    """Delete a message from the chat."""
+
+    data = context.job.data
+
+    try:
+        await context.bot.delete_message(chat_id=data["chat_id"], message_id=data["message_id"])
+    except Exception as e:
+        logger.error(f"Error deleting message: {e}")

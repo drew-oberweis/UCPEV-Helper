@@ -26,6 +26,7 @@ import utils
 import message_queue
 from utils import UpdateBundle
 import scheduled
+import task_schedulers
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +62,10 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         logger.error(f"Error in error handler: {e}")
 
 def main(queue=None):
-    logger.info("Telgram bot start initiated")
+    logger.info("Telegram bot start initiated")
     app = Application.builder().token(token).build()
+
+    task_schedulers.define_app(app)
 
     for i in commands_map:
         app.add_handler(CommandHandler(i, commands_map[i]))

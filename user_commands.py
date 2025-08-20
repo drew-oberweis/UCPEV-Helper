@@ -18,6 +18,8 @@ import ride
 from utils import UpdateBundle
 import sheets_interface as shit
 
+import task_schedulers
+
 responses = data.responses
 command_descriptions = data.command_descriptions
 admin_command_descriptions = data.admin_command_descriptions
@@ -121,14 +123,56 @@ async def econtact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def rides(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ub = UpdateBundle(update, context)
 
+    # get number from message
     try:
-        # get the next ride
-        rides = shit.get_upcoming_rides()
-        ride = rides[0]
-    except IndexError as e:
-        await ub.send_message("There are no scheduled rides.")
-        return
+        number = int(context.args[0])
+    except ValueError:
+       await ub.send_message("Please provide a valid number of rides.")
+       return
+    except IndexError:
+        number = None
 
-    message = utils.generate_ride_text(ride)
+    if number is None:
+        try:
+            # get the next ride
+            rides = shit.get_upcoming_rides()
+            ride = rides[0]
+        except IndexError as e:
+            await ub.send_message("There are no scheduled rides.")
+            return
+
+        message = utils.generate_ride_text(ride)
+    else:
+
+        # if command is run in non-dm, delete message
+        if not update.message.chat.type == "private":
+            response = await ub.send_message("This command can only be used in private messages. Please use the command in a private chat with @uc_pev_bot.")
+
+            # schedule deletion of message in 10 seconds
+            response_data = {
+                "chat_id": update.effective_chat.id,
+                "message_id": response.id
+            }
+            task_schedulers.add_single_task(utils.scheduled_delete_message, 10, response_data)
+
+            message_data = {
+                "chat_id": update.effective_chat.id,
+                "message_id": update.effective_message.id
+            }
+            task_schedulers.add_single_task(utils.scheduled_delete_message, 10, message_data)
+            return
+
+        message = ""
+        separator = "\n\n--------------------------------\n\n"
+        try:
+            rides = shit.get_upcoming_rides()
+            for i in range(min(number, len(rides))):
+                message += utils.generate_ride_text(rides[i]) + separator
+            
+            # remove the final separator
+            message = message.rstrip(separator)
+        except Exception as e:
+            await ub.send_message(f"There was an error retrieving the rides: {e}")
+            return
 
     await ub.send_message(message)
