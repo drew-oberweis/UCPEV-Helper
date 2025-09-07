@@ -1,66 +1,71 @@
 import os
-from dotenv import load_dotenv 
 import logging
+import yaml
 
 logger = logging.getLogger(__name__)
 
-def get_telegram_token():
-    load_dotenv()
+def read_config(file_path: str = "./config/config.yml") -> dict:
     try:
-        token = os.environ['telegram_token']
+        with open(file_path, 'r') as file:
+            config = yaml.safe_load(file)
+            logger.info(f"Configuration loaded successfully from {file_path}")
+            return config
+    except Exception as e:
+        logger.error(f"Error loading configuration from {file_path}: {e}")
+        return {}
+
+def get_telegram_token():
+    config = read_config()
+    try:
+        token = config['telegram_token']
     except KeyError:
-        logger.error("Telegram token not found in environment variables.")
+        logger.error("Telegram token not found in configuration.")
         token = None
     return token
 
 def get_discord_token():
-    load_dotenv()
+    config = read_config()
     try:
-        token = os.environ['discord_token']
+        token = config['discord_token']
     except KeyError:
-        logger.error("Discord token not found in environment variables.")
+        logger.error("Discord token not found in configuration.")
         token = None
     return token
 
 def get_discord_announcement_webhook() -> str:
-    load_dotenv()
+    config = read_config()
     try:
-        webhook = os.environ['discord_announcement_webhook']
+        webhook = config['discord_announcement_webhook']
     except KeyError:
-        logger.error("Discord announcement webhook not found in environment variables.")
+        logger.error("Discord announcement webhook not found in configuration.")
         webhook = None
     return webhook
 
 def get_discord_webhook(channel: str) -> str:
-    load_dotenv()
-
+    config = read_config()
     try:
-        env_name = f"{channel}_webhook"
-        webhook = os.environ[env_name]
-        logger.debug(f"Found {webhook} while searching for {env_name} in environment variables.")
-        if not webhook:
-            raise ValueError(f"Webhook for {channel} is not set in environment variables when searching for {env_name}.")
-        return webhook
+        webhook = config[f"channel_{channel}"]
     except KeyError:
-        logger.error(f"{channel} webhook not found in environment variables when searching for {env_name}.")
-        return None
+        logger.error(f"{channel} webhook not found in configuration.")
+        webhook = None
+    return webhook
     
 def get_telegram_chat_id():
-    load_dotenv()
+    config = read_config()
     try:
-        chat_id = int(os.environ['telegram_chat_id'])
+        chat_id = int(config['telegram_chat_id'])
     except KeyError:
-        logger.error("Telegram chat ID not found in environment variables.")
+        logger.error("Telegram chat ID not found in configuration.")
         chat_id = None
     except ValueError:
-        logger.error("Telegram chat ID in environment variables is not a valid integer.")
+        logger.error("Telegram chat ID in configuration is not a valid integer.")
         chat_id = None
 
     return chat_id
 
 def get_log_level():
-    load_dotenv()
-    raw =  os.getenv("log_level")
+    config = read_config()
+    raw = config.get("log_level")
 
     if raw == "DEBUG":
         return logging.DEBUG
@@ -77,13 +82,13 @@ def get_log_level():
         return logging.INFO # info should be default
 
 def get_database_config():
-    load_dotenv()
+    config = read_config()
     try:
-        name = os.environ['db_name']
-        user = os.environ['db_user']
-        password = os.environ['db_password']
-        host = os.environ['db_host']
-        port = os.environ['db_port']
+        name = config['database'].get('db_name')
+        user = config['database'].get('db_user')
+        password = config['database'].get('db_password')
+        host = config['database'].get('db_host')
+        port = config['database'].get('db_port')
     except KeyError as e:
         logger.error(f"Database configuration error: {e}")
         return None
