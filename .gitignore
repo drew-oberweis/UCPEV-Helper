@@ -169,3 +169,5 @@ google_creds.json
 token.json
 
 .DS_Store
+
+default_config.yml
