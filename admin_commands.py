@@ -85,8 +85,8 @@ async def make_ride_poll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         Maybe
     """
 
-    # generate poll expiration, 12 hours after message sent
-    poll_expiration = datetime.now().timestamp() + 43200
+    # generate poll expiration, 36 hours after message sent
+    poll_expiration = datetime.now().timestamp() + 129600
 
     # Delete the command message
     await context.bot.delete_message(update.effective_chat.id, update.message.message_id) #TODO: implement this using UpdateBundle
